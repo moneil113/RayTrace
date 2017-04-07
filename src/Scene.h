@@ -11,7 +11,8 @@ class Scene {
 private:
     Camera camera;
     std::vector<Light> lights;
-    std::vector<Geometry *> geometry;
+    // Geometry is an abstract class, so we need pointers
+    std::vector<std::shared_ptr<Geometry>> geometry;
 
 public:
     Scene();
@@ -19,7 +20,7 @@ public:
     void print();
     void setCamera(Camera newCam);
     void addLight(Light l);
-    void addGeometry(Geometry *g);
+    void addGeometry(std::shared_ptr<Geometry> g);
 };
 
 #endif

@@ -52,7 +52,7 @@ std::shared_ptr<Scene> Parser::parse() {
             parseTriangle();
         }
         else {
-            std::cout << "not supported: " << line << '\n';
+            cout << "not supported: " << line << '\n';
         }
     }
 
@@ -98,7 +98,7 @@ void Parser::parseLight_source(std::string line) {
 }
 
 void Parser::parseSphere(std::string l) {
-    Sphere *s = new Sphere(); // geometry vector is abstract, so we need pointer
+    shared_ptr<Sphere> s = make_shared<Sphere>();
     s->center = readVec3(l);
     int start = l.find(">");
     s->radius = readFloat(l.substr(start));
@@ -114,7 +114,7 @@ void Parser::parseSphere(std::string l) {
 }
 
 void Parser::parsePlane(std::string l) {
-    Plane *p = new Plane();
+    shared_ptr<Plane> p = make_shared<Plane>();
     p->normal = readVec3(l);
     int start = l.find(">");
     p->distance = readFloat(l.substr(start));
@@ -130,7 +130,7 @@ void Parser::parsePlane(std::string l) {
 }
 
 void Parser::parseBox(std::string l) {
-    Box *b = new Box();
+    shared_ptr<Box> b = make_shared<Box>();
     b->corner1 = readVec3(l);
     int start = l.find(">");
     b->corner2 = readVec3(l.substr(start));
@@ -146,7 +146,7 @@ void Parser::parseBox(std::string l) {
 }
 
 void Parser::parseCone(std::string l) {
-    Cone *c = new Cone();
+    shared_ptr<Cone> c = make_shared<Cone>();
     c->base = readVec3(l);
     int start = l.find(">");
     c->baseRadius = readFloat(l.substr(start));
@@ -165,8 +165,8 @@ void Parser::parseCone(std::string l) {
 }
 
 void Parser::parseTriangle() {
-    Triangle *t = new Triangle();
-    std::string line;
+    shared_ptr<Triangle> t = make_shared<Triangle>();
+    string line;
     bool done = false;
 
     getline(in, line);
@@ -183,7 +183,7 @@ void Parser::parseTriangle() {
     scene->addGeometry(t);
 }
 
-bool Parser::parseProperties(Geometry *object, std::string line) {
+bool Parser::parseProperties(std::shared_ptr<Geometry> object, std::string line) {
     bool done = false;
 
     if (line.find("pigment") != string::npos) {
@@ -208,7 +208,7 @@ bool Parser::parseProperties(Geometry *object, std::string line) {
         done = true;
     }
     else {
-        std::cerr << "bad property: " << line << '\n';
+        cerr << "bad property: " << line << '\n';
     }
 
     return done;

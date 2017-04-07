@@ -30,6 +30,6 @@ void Scene::addLight(Light l) {
     lights.push_back(l);
 }
 
-void Scene::addGeometry(Geometry *g) {
+void Scene::addGeometry(std::shared_ptr<Geometry> g) {
     geometry.push_back(g);
 }
