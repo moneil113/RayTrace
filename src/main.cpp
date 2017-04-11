@@ -2,14 +2,29 @@
 #include "Parser.h"
 
 int main(int argc, char const *argv[]) {
-    if (argc != 2) {
-        std::cout << "usage: RayTrace <input file>" << '\n';
+    if (argc < 3) {
+        std::cout << "usage: RayTrace <mode> <input file>" << '\n';
         exit(-1);
     }
-    Parser *p = new Parser(argv[1]);
-
+    Parser *p = new Parser(argv[2]);
     std::shared_ptr<Scene> sc = p->parse();
-    sc->print();
+
+    if (strstr(argv[1], "sceneinfo")) {
+        sc->print();
+    }
+    else if (strstr(argv[1], "pixelray")) {
+        if (argc != 7) {
+            std::cout << "usage: RayTrace pixelray <input file> <width> <height> <x> <y>" << '\n';
+            exit(-1);
+        }
+        sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
+
+        sc->pixelTest(atoi(argv[5]), atoi(argv[6]));
+    }
+    else {
+        std::cout << "usage: RayTrace <mode> <input file>" << '\n';
+        exit(-1);
+    }
 
     return 0;
 }

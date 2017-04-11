@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Scene.h"
+#include "Ray.h"
 
 Scene::Scene() {
 
@@ -26,10 +27,20 @@ void Scene::setCamera(Camera newCam) {
     camera = newCam;
 }
 
+void Scene::setImageSize(int width, int height) {
+    camera.setImageSize(width, height);
+}
+
 void Scene::addLight(Light l) {
     lights.push_back(l);
 }
 
 void Scene::addGeometry(std::shared_ptr<Geometry> g) {
     geometry.push_back(g);
+}
+
+void Scene::pixelTest(int x, int y) {
+    std::cout << "in Scene::pixelTest()" << '\n';
+    std::cout << "Pixel: [" << x << " " << y << "] ";
+    std::cout << "Ray: " << camera.rayToPixel(x, y).to_string() << '\n';
 }

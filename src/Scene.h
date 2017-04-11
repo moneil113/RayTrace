@@ -19,8 +19,11 @@ public:
 
     void print();
     void setCamera(Camera newCam);
+    void setImageSize(int width, int height);
     void addLight(Light l);
     void addGeometry(std::shared_ptr<Geometry> g);
+
+    void pixelTest(int x, int y);
 };
 
 #endif
