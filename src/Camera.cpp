@@ -21,9 +21,6 @@ Ray Camera::rayToPixel(int x, int y) {
     float u_s = l + (r - l) * (x + 0.5) / width;
     float v_s = b + (t - b) * (y + 0.5) / height;
 
-    std::cout << "u_s = " << u_s << '\n';
-    std::cout << "v_s = " << v_s << '\n';
-
     Vector3f S = u_s * right + v_s * up + look_at;
 
     return Ray(location, S);
@@ -37,10 +34,10 @@ void Camera::setImageSize(int width, int height) {
 std::string Camera::to_string() {
     std::stringstream str;
     str << "Camera: \n";
-    str << "      loc     = " << formatVector(location) << '\n';
-    str << "      up      = " << formatVector(up) << '\n';
-    str << "      right   = " << formatVector(right) << '\n';
-    str << "      look_at = " << formatVector(look_at) << '\n';
+    str << "- Location: " << formatVector(location) << '\n';
+    str << "- Up: " << formatVector(up) << '\n';
+    str << "- Right: " << formatVector(right) << '\n';
+    str << "- Look at: " << formatVector(look_at) << '\n';
 
     return str.str();
 }

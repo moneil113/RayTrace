@@ -14,7 +14,8 @@ public:
     Triangle ();
 
     std::string to_string();
+    std::string type();
 
-    void trace() {}
+    floatOptional intersect(Ray &r) { return {false, 0.0f}; }
 };
 #endif

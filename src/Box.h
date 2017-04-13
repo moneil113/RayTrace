@@ -1,7 +1,6 @@
 #ifndef BOX_H
 #define BOX_H
 
-
 #include "Geometry.h"
 #include <Eigen/Dense>
 
@@ -15,7 +14,8 @@ public:
     Box ();
 
     std::string to_string();
+    std::string type();
 
-    void trace() {}
+    floatOptional intersect(Ray &r) { return {false, 0.0f}; }
 };
 #endif

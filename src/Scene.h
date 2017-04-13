@@ -24,6 +24,7 @@ public:
     void addGeometry(std::shared_ptr<Geometry> g);
 
     void pixelTest(int x, int y);
+    void firstHitTest(int x, int y);
 };
 
 #endif

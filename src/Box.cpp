@@ -14,3 +14,7 @@ std::string Box::to_string() {
 
     return str.str();
 }
+
+std::string Box::type() {
+    return "Box";
+}

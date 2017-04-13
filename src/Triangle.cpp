@@ -15,3 +15,7 @@ std::string Triangle::to_string() {
 
     return str.str();
 }
+
+std::string Triangle::type() {
+    return "Triangle";
+}

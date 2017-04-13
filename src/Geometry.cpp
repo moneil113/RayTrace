@@ -16,13 +16,14 @@ static const std::string transformString(int type) {
 
 std::string Geometry::to_string() {
     std::stringstream str;
-    str << "      pigment  = " << formatVector(pigment) << "\n";
-    str << "      ambient  = " << ambient << "\n";
-    str << "      diffuse  = " << diffuse << "\n";
-    for (size_t i = 0; i < transformTypes.size(); i++) {
-        str << "        " << transformString(transformTypes.at(i));
-        str << formatVector(transformValues.at(i)) << "\n";
-    }
+    str << "- Color: " << formatVector(pigment) << "\n";
+    str << "- Material:\n";
+    str << "  - Ambient: " << ambient << "\n";
+    str << "  - Diffuse: " << diffuse << "\n";
+    // for (size_t i = 0; i < transformTypes.size(); i++) {
+    //     str << "        " << transformString(transformTypes.at(i));
+    //     str << formatVector(transformValues.at(i)) << "\n";
+    // }
 
     return str.str();
 }

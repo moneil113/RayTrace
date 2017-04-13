@@ -16,3 +16,7 @@ std::string Cone::to_string() {
 
     return str.str();
 }
+
+std::string Cone::type() {
+    return "Cone";
+}
