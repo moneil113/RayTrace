@@ -4,8 +4,9 @@
 
 using namespace std;
 
-Scene::Scene() {
-
+Scene::Scene() :
+    renderer(this)
+{
 }
 
 void Scene::print() {
@@ -37,6 +38,7 @@ void Scene::setCamera(Camera newCam) {
 
 void Scene::setImageSize(int width, int height) {
     camera.setImageSize(width, height);
+    renderer.setImageSize(width, height);
 }
 
 void Scene::addLight(Light l) {
@@ -47,6 +49,34 @@ void Scene::addGeometry(std::shared_ptr<Geometry> g) {
     geometry.push_back(g);
 }
 
+std::shared_ptr<Geometry> Scene::firstHit(int x, int y, floatOptional &t) {
+    Ray r = camera.rayToPixel(x, y);
+
+    t = {false, INFINITY};
+    floatOptional temp;
+    shared_ptr<Geometry> objectHit;
+
+    for (int i = 0; i < geometry.size(); i++) {
+        temp = geometry[i]->intersect(r);
+
+        if (temp.valid && temp.value < t.value) {
+            t = temp;
+            objectHit = geometry[i];
+        }
+    }
+
+    if (t.valid) {
+        return objectHit;
+    }
+    else {
+        return NULL;
+    }
+}
+
+void Scene::render(std::string outputFile) {
+    renderer.renderScene(outputFile);
+}
+
 void Scene::pixelTest(int x, int y) {
     cout << "Pixel: [" << x << " " << y << "] ";
     cout << "Ray: " << camera.rayToPixel(x, y).to_string() << '\n';
@@ -55,18 +85,9 @@ void Scene::pixelTest(int x, int y) {
 void Scene::firstHitTest(int x, int y) {
     pixelTest(x, y);
 
-    floatOptional t = {false, INFINITY}, temp;
-    shared_ptr<Geometry> objectHit;
+    floatOptional t;
 
-    for (int i = 0; i < geometry.size(); i++) {
-        Ray r = camera.rayToPixel(x, y);
-        temp = geometry[i]->intersect(r);
-
-        if (temp.valid && temp.value < t.value) {
-            t = temp;
-            objectHit = geometry[i];
-        }
-    }
+    std::shared_ptr<Geometry> objectHit = firstHit(x, y, t);
 
     if (t.valid) {
         cout << "T = " << t.value << "\n";

@@ -22,7 +22,7 @@ std::string Sphere::type() {
 
 floatOptional Sphere::intersect(Ray &r) {
     float A = r.direction().dot(r.direction());
-    Eigen::Vector3f temp = (r.origin() - center).normalized();
+    Eigen::Vector3f temp = (r.origin() - center);
     float B = 2 * temp.dot(r.direction());
     float C = temp.dot(temp) - radius * radius;
 

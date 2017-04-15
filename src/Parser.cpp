@@ -14,7 +14,7 @@ using namespace std;
 using namespace Eigen;
 
 Parser::Parser(std::string file) {
-    in.open(file);
+    in.open("../resources/" + file);
     if (!in.is_open()) {
         cerr << "could not open " << file << '\n';
         exit(-1);

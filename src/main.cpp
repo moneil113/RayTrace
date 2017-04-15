@@ -26,6 +26,11 @@ int main(int argc, char const *argv[]) {
 
         sc->firstHitTest(atoi(argv[5]), atoi(argv[6]));
     }
+    else if (strstr(argv[1], "render")) {
+        sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
+        
+        sc->render("output.png");
+    }
     else {
         std::cout << "usage: RayTrace <mode> <input file>" << '\n';
         exit(-1);

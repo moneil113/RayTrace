@@ -2,6 +2,7 @@
 #define OBJECT_H
 
 #include <Eigen/Dense>
+#include <iomanip>
 
 class Object {
 friend class Parser;

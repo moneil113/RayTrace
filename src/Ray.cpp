@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iomanip>
 #include "Ray.h"
 
 Ray::Ray(Eigen::Vector3f origin, Eigen::Vector3f direction) {
@@ -16,11 +17,11 @@ std::string formatVector(Eigen::Vector3f v) {
         ", ", ", ", "", "", "", "");
 
     std::stringstream str;
+    str << std::setprecision(4);
     str << v.format(CommaInitFmt);
 
     return str.str();
 }
-
 
 std::string Ray::to_string() {
     std::stringstream str;
