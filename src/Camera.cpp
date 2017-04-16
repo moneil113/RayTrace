@@ -28,7 +28,7 @@ void Camera::setImageSize(int width, int height) {
 
 std::string Camera::to_string() {
     stringstream str;
-    str << "Camera: \n";
+    str << "Camera:\n";
     str << "- Location: " << formatVector(location) << '\n';
     str << "- Up: " << formatVector(up) << '\n';
     str << "- Right: " << formatVector(right) << '\n';

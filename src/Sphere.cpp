@@ -8,7 +8,7 @@ Sphere::Sphere() {
 
 std::string Sphere::to_string() {
     std::stringstream str;
-    str << "- Type: Sphere:\n";
+    str << "- Type: Sphere\n";
     str << "- Center: " << formatVector(center) << "\n";
     str << "- Radius: " << radius << "\n";
     str << Geometry::to_string();

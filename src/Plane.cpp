@@ -13,7 +13,7 @@ Plane::Plane() {
 std::string Plane::to_string() {
     stringstream str;
     str << setprecision(4);
-    str << "- Type: Plane:\n";
+    str << "- Type: Plane\n";
     str << "- Normal: " << formatVector(normal) << "\n";
     str << "- Distance: " << distance << "\n";
     str << Geometry::to_string();

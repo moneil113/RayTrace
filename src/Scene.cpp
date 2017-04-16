@@ -26,7 +26,7 @@ void Scene::print() {
 
     for (size_t i = 0; i < geometry.size(); i++) {
         cout << "\n";
-        cout << "Object: [" << i << "]:\n";
+        cout << "Object[" << i << "]:\n";
         cout << geometry.at(i)->to_string();
     }
 
@@ -78,7 +78,7 @@ void Scene::render(std::string outputFile) {
 }
 
 void Scene::pixelTest(int x, int y) {
-    cout << "Pixel: [" << x << " " << y << "] ";
+    cout << "Pixel: [" << x << ", " << y << "] ";
     cout << "Ray: " << camera.rayToPixel(x, y).to_string() << '\n';
 }
 
@@ -90,10 +90,13 @@ void Scene::firstHitTest(int x, int y) {
     std::shared_ptr<Geometry> objectHit = firstHit(x, y, t);
 
     if (t.valid) {
+        cout << setprecision(4);
         cout << "T = " << t.value << "\n";
         cout << "Object Type: " << objectHit->type() << '\n';
-        Eigen::Vector3f color = objectHit->color() * 255;
-        printf("Color: (%d, %d, %d)\n", (int) color.x(), (int) color.y(), (int) color.z());
+        Eigen::Vector3f color = objectHit->color();
+        cout << "Color: ";
+        cout << color.x() << " " << color.y() << " " << color.z() << "\n";
+        // printf("Color: %.2f %.2f %.2f\n", color.x(), color.y(), color.z());
     }
     else {
         cout << "No Hit" << '\n';
