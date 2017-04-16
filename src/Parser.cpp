@@ -223,7 +223,8 @@ Eigen::Vector3f Parser::parsePigment(std::string line) {
 Eigen::Vector3f Parser::readVec3(std::string line) {
     float x, y, z;
     int start = line.find("<");
-    const char *str = line.substr(start).c_str();
+    string sub = line.substr(start);
+    const char *str = sub.c_str();
     sscanf(str, "<%f, %f, %f>", &x, &y, &z);
 
     return Vector3f(x, y, z);
