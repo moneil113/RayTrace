@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include "Parser.h"
 #include "Scene.h"

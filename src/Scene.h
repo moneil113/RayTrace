@@ -7,6 +7,7 @@
 #include "Renderer.h"
 
 #include <vector>
+#include <memory>
 
 class Scene {
 friend class Renderer;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include "Parser.h"
 
 int main(int argc, char const *argv[]) {
@@ -28,7 +29,7 @@ int main(int argc, char const *argv[]) {
     }
     else if (strstr(argv[1], "render")) {
         sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
-        
+
         sc->render("output.png");
     }
     else {
