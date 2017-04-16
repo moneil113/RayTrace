@@ -96,7 +96,6 @@ void Scene::firstHitTest(int x, int y) {
         Eigen::Vector3f color = objectHit->color();
         cout << "Color: ";
         cout << color.x() << " " << color.y() << " " << color.z() << "\n";
-        // printf("Color: %.2f %.2f %.2f\n", color.x(), color.y(), color.z());
     }
     else {
         cout << "No Hit" << '\n';

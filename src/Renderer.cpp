@@ -49,5 +49,4 @@ void Renderer::renderScene(std::string output) {
     }
 
     stbi_write_png(output.c_str(), width, height, 3, pixels, width * sizeof(Color_t));
-    // stbi_write_png(fileName.c_str(), size.x, size.y, numChannels, data, size.x * numChannels);
 }
