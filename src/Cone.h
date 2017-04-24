@@ -18,5 +18,6 @@ public:
     std::string type();
 
     floatOptional intersect(Ray &r) { return {false, 0.0f}; }
+    Eigen::Vector3f normalAtPoint(Eigen::Vector3f p) { return Eigen::Vector3f(0, 0, 0); };
 };
 #endif

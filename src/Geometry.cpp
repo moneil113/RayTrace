@@ -18,8 +18,8 @@ std::string Geometry::to_string() {
     std::stringstream str;
     str << "- Color: " << formatVector(pigment) << "\n";
     str << "- Material:\n";
-    str << "  - Ambient: " << ambient << "\n";
-    str << "  - Diffuse: " << diffuse << "\n";
+    str << "  - Ambient: " << finish.ambient << "\n";
+    str << "  - Diffuse: " << finish.diffuse << "\n";
     // for (size_t i = 0; i < transformTypes.size(); i++) {
     //     str << "        " << transformString(transformTypes.at(i));
     //     str << formatVector(transformValues.at(i)) << "\n";

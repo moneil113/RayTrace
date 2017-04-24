@@ -46,3 +46,7 @@ floatOptional Sphere::intersect(Ray &r) {
 
     return ret;
 }
+
+Eigen::Vector3f Sphere::normalAtPoint(Eigen::Vector3f p) {
+    return (p - center).normalized();
+}

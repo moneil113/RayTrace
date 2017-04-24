@@ -37,3 +37,7 @@ floatOptional Plane::intersect(Ray &r) {
     }
     return {true, t};
 }
+
+Eigen::Vector3f Plane::normalAtPoint(Eigen::Vector3f p) {
+    return normal;
+}

@@ -15,7 +15,7 @@ using namespace std;
 using namespace Eigen;
 
 Parser::Parser(std::string file) {
-    in.open("../resources/" + file);
+    in.open(file);
     if (!in.is_open()) {
         cerr << "could not open " << file << '\n';
         exit(-1);
@@ -192,9 +192,10 @@ bool Parser::parseProperties(std::shared_ptr<Geometry> object, std::string line)
     }
     else if (line.find("finish") != string::npos) {
         int start = line.find("ambient");
-        object->ambient = readFloat(line.substr(start));
+        object->finish.ambient = readFloat(line.substr(start));
         start = line.find("diffuse");
-        object->diffuse = readFloat(line.substr(start));
+        object->finish.diffuse = readFloat(line.substr(start));
+        object->finish.specular = 0;
     }
     else if (line.find("translate") != string::npos) {
         object->addTransform(TRANSFORM_TRANSLATE, readVec3(line));

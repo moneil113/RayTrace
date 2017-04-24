@@ -16,6 +16,12 @@ typedef struct {
     float value;
 } floatOptional;
 
+typedef struct {
+    float ambient;
+    float diffuse;
+    float specular;
+} Finish_t;
+
 class Ray;
 
 class Geometry : public Object {
@@ -23,8 +29,7 @@ friend class Parser;
 
 protected:
     Eigen::Vector3f pigment;
-    float ambient;
-    float diffuse;
+    Finish_t finish;
 
     std::vector<Eigen::Vector3f> transformValues;
     std::vector<int> transformTypes;
@@ -36,12 +41,17 @@ public:
     virtual std::string type() = 0;
 
     void addTransform(int type, Eigen::Vector3f value);
-    Eigen::Vector3f color() const { return pigment; }
+    Eigen::Vector3f color() { return pigment; }
+    Finish_t getFinish() { return finish; }
 
     // Tests for intersection. If there is no intersection, the floatOptional
     // will not be valid. If there is an intersection, the value of the
     // floatOptional will be the closest nonnegative t value of the input ray.
     virtual floatOptional intersect(Ray &r) = 0;
+
+    // Given a point on the surface, return the normal
+    // Assumes that the given point is on the surface of the object
+    virtual Eigen::Vector3f normalAtPoint(Eigen::Vector3f p) = 0;
 };
 
 #endif

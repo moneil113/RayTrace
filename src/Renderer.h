@@ -4,22 +4,32 @@
 #include <vector>
 #include <Eigen/Dense>
 
-typedef struct {
+struct Color_t {
     unsigned char r;
     unsigned char g;
     unsigned char b;
-} Color_t;
+
+    Color_t operator+=(const Color_t &rhs)  {
+        r += rhs.r;
+        g += rhs.g;
+        b += rhs.b;
+        return *this;
+    }
+};
 
 class Scene;
+class Ray;
+class Geometry;
 
 class Renderer {
 private:
     Color_t *pixels;
-
-    Color_t colorFromVector(Eigen::Vector3f &v);
     int width, height;
 
     Scene *scene;
+
+    Color_t colorFromVector(Eigen::Vector3f &v);
+    Color_t calculateColor(Ray &r, float t, std::shared_ptr<Geometry> object);
 
 public:
     Renderer(Scene *sc);

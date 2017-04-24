@@ -18,7 +18,7 @@ private:
     std::vector<std::shared_ptr<Geometry>> geometry;
     Renderer renderer;
 
-    std::shared_ptr<Geometry> firstHit(int x, int y, floatOptional &t);
+    std::shared_ptr<Geometry> firstHit(Ray r, floatOptional &t);
 
 public:
     Scene();

@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include "Ray.h"
 
+#define EPSILON 0.0001f
+
 using namespace std;
 
 Scene::Scene() :
@@ -49,9 +51,7 @@ void Scene::addGeometry(std::shared_ptr<Geometry> g) {
     geometry.push_back(g);
 }
 
-std::shared_ptr<Geometry> Scene::firstHit(int x, int y, floatOptional &t) {
-    Ray r = camera.rayToPixel(x, y);
-
+std::shared_ptr<Geometry> Scene::firstHit(Ray r, floatOptional &t) {
     t = {false, INFINITY};
     floatOptional temp;
     shared_ptr<Geometry> objectHit;
@@ -59,7 +59,7 @@ std::shared_ptr<Geometry> Scene::firstHit(int x, int y, floatOptional &t) {
     for (int i = 0; i < geometry.size(); i++) {
         temp = geometry[i]->intersect(r);
 
-        if (temp.valid && temp.value < t.value) {
+        if (temp.valid && temp.value > EPSILON && temp.value < t.value) {
             t = temp;
             objectHit = geometry[i];
         }
@@ -87,7 +87,9 @@ void Scene::firstHitTest(int x, int y) {
 
     floatOptional t;
 
-    std::shared_ptr<Geometry> objectHit = firstHit(x, y, t);
+    Ray r = camera.rayToPixel(x, y);
+
+    std::shared_ptr<Geometry> objectHit = firstHit(r, t);
 
     if (t.valid) {
         cout << setprecision(4);
