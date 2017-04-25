@@ -26,6 +26,7 @@ public:
     void print();
     void setCamera(Camera newCam);
     void setImageSize(int width, int height);
+    void setBRDF(int type);
     void addLight(Light l);
     void addGeometry(std::shared_ptr<Geometry> g);
 

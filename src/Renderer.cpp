@@ -3,6 +3,7 @@
 #include "Ray.h"
 
 #include <math.h>
+#include <iostream>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -13,6 +14,7 @@ using namespace Eigen;
 Renderer::Renderer(Scene *sc) {
     pixels = NULL;
     scene = sc;
+    brdf = 0;
 }
 
 Color_t Renderer::colorFromVector(Eigen::Vector3f &v) {
@@ -22,6 +24,10 @@ Color_t Renderer::colorFromVector(Eigen::Vector3f &v) {
     color.b = (unsigned char) round(v.z() * 255.f);
 
     return color;
+}
+
+void Renderer::setBRDF(int type) {
+    brdf = type;
 }
 
 void Renderer::setImageSize(int width, int height) {
@@ -35,6 +41,19 @@ void Renderer::setImageSize(int width, int height) {
 }
 
 Color_t Renderer::calculateColor(Ray &r, float t, std::shared_ptr<Geometry> object) {
+    if (brdf == 0) {
+        return blinnPhongColor(r, object, r.getPoint(t));
+    }
+    else if (brdf == 1) {
+        return cookTorranceColor(r, object, r.getPoint(t));
+    }
+    else {
+        std::cerr << "Unknown brdf model! Exiting" << '\n';
+        exit(-1);
+    }
+}
+
+Color_t Renderer::blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
     Vector3f pigment = object->color();
 
     Vector3f ka = object->getFinish().ambient * pigment;
@@ -44,7 +63,6 @@ Color_t Renderer::calculateColor(Ray &r, float t, std::shared_ptr<Geometry> obje
     Color_t color = colorFromVector(ka);
     shared_ptr<Geometry> hit;
 
-    Vector3f p = r.getPoint(t);
     Vector3f n = object->normalAtPoint(p);
     Vector3f v = (r.origin() - p).normalized();
 
@@ -63,6 +81,11 @@ Color_t Renderer::calculateColor(Ray &r, float t, std::shared_ptr<Geometry> obje
 
     return color;
 }
+
+Color_t Renderer::cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
+    return {0, 0, 0};
+}
+
 
 void Renderer::renderScene(std::string output) {
     shared_ptr<Geometry> hitObject;

@@ -43,6 +43,10 @@ void Scene::setImageSize(int width, int height) {
     renderer.setImageSize(width, height);
 }
 
+void Scene::setBRDF(int type) {
+    renderer.setBRDF(type);
+}
+
 void Scene::addLight(Light l) {
     lights.push_back(l);
 }

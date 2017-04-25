@@ -23,7 +23,8 @@ void Camera::setImageSize(int width, int height) {
     this->width = width;
     this->height = height;
 
-    look_at = Vector3f(0.f, 0.f, -1.f);
+    look_at -= location;
+    look_at.normalize();
 }
 
 std::string Camera::to_string() {
