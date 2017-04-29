@@ -62,7 +62,7 @@ Color_t Renderer::blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eige
     float power = object->getFinish().roughness;
     power = (2 / (power * power) - 2);
 
-    Color_t color = colorFromVector(ka);
+    Vector3f color = ka;
 
     Vector3f n = object->normalAtPoint(p);
     Vector3f v = -r.direction().normalized();
@@ -86,30 +86,29 @@ Color_t Renderer::blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eige
         if (!hit) {
             Vector3f h = (v + l).normalized();
             Vector3f lc = light.getColor();
-            Color_t diff = blinnPhongDiffuse(n, l, kd, lc);
-            Color_t spec = blinnPhongSpecular(n, h, ks, power, lc);
+            Vector3f diff = blinnPhongDiffuse(n, l, kd, lc);
+            Vector3f spec = blinnPhongSpecular(n, h, ks, power, lc);
             color += diff;
             color += spec;}
     }
 
-    return color;
+    return colorFromVector(color);
 }
 
-Color_t Renderer::blinnPhongDiffuse(Eigen::Vector3f &n, Eigen::Vector3f &l,
+Vector3f Renderer::blinnPhongDiffuse(Eigen::Vector3f &n, Eigen::Vector3f &l,
     Eigen::Vector3f &kd, Eigen::Vector3f &lightColor)
 {
     Vector3f temp = kd * fmaxf(0, n.dot(l));
     temp = temp.cwiseProduct(lightColor);
-    return colorFromVector(temp);
+    return temp;
 }
 
-Color_t Renderer::blinnPhongSpecular(Eigen::Vector3f &n, Eigen::Vector3f &h,
+Vector3f Renderer::blinnPhongSpecular(Eigen::Vector3f &n, Eigen::Vector3f &h,
     Eigen::Vector3f &ks, float power, Eigen::Vector3f &lightColor)
 {
     Vector3f temp = ks * powf(fmaxf(0, h.dot(n)), power);
-
     temp = temp.cwiseProduct(lightColor);
-    return colorFromVector(temp);
+    return temp;
 }
 
 Color_t Renderer::cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {

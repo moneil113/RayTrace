@@ -21,7 +21,7 @@ struct Color_t {
 
     friend std::ostream& operator<<(std::ostream &os, const Color_t &rhs)
     {
-        return os << "(" << (int) rhs.r << " " << (int) rhs.g << " " << (int) rhs.b << ")";
+        return os << "(" << (int) rhs.r << ", " << (int) rhs.g << ", " << (int) rhs.b << ")";
     }
 };
 
@@ -42,9 +42,9 @@ private:
     Color_t blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
     Color_t cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
 
-    Color_t blinnPhongDiffuse(Eigen::Vector3f &n, Eigen::Vector3f &l,
+    Eigen::Vector3f blinnPhongDiffuse(Eigen::Vector3f &n, Eigen::Vector3f &l,
         Eigen::Vector3f &kd, Eigen::Vector3f &lightColor);
-    Color_t blinnPhongSpecular(Eigen::Vector3f &n, Eigen::Vector3f &h,
+    Eigen::Vector3f blinnPhongSpecular(Eigen::Vector3f &n, Eigen::Vector3f &h,
         Eigen::Vector3f &ks, float power, Eigen::Vector3f &lightColor);
 
 public:
