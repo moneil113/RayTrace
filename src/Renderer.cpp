@@ -48,7 +48,7 @@ Color_t Renderer::calculateColor(Ray &r, float t, std::shared_ptr<Geometry> obje
         return cookTorranceColor(r, object, r.getPoint(t));
     }
     else {
-        std::cerr << "Unknown brdf model! Exiting" << '\n';
+        std::cerr << "Unknown brdf. Exiting" << '\n';
         exit(-1);
     }
 }
@@ -58,34 +58,71 @@ Color_t Renderer::blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eige
 
     Vector3f ka = object->getFinish().ambient * pigment;
     Vector3f kd = object->getFinish().diffuse * pigment;
-    // Vector3f ks = object->getFinish().specular * pigment;
+    Vector3f ks = object->getFinish().specular * pigment;
+    float power = object->getFinish().roughness;
+    power = (2 / (power * power) - 2);
 
     Color_t color = colorFromVector(ka);
-    shared_ptr<Geometry> hit;
 
     Vector3f n = object->normalAtPoint(p);
-    Vector3f v = (r.origin() - p).normalized();
+    Vector3f v = -r.direction().normalized();
 
-    Vector3f l, h, lColor, temp;
+    // for shadow
+    shared_ptr<Geometry> hit;
+
     for (int i = 0; i < scene->lights.size(); i++) {
-        l = (scene->lights.at(i).getLocation() - p).normalized();
-        floatOptional ft;
-        hit = scene->firstHit(Ray(p, l), ft);
-        if (!hit) {
-            h = (l + v).normalized();
-            lColor = scene->lights.at(i).getColor();
-            temp = kd * fmaxf(0, n.dot(l));
-            color += colorFromVector(temp);
+        Light light = scene->lights.at(i);
+        Vector3f l = (light.getLocation() - p).normalized();
+        floatOptional t;
+        Ray lightRay = Ray(p, l);
+        hit = scene->firstHit(lightRay, t);
+        //Check if we hit something behind the light
+        if (hit) {
+            if ((light.getLocation() - p).norm() < t.value) {
+                hit = NULL;
+            }
         }
+
+        if (!hit) {
+            Vector3f h = (v + l).normalized();
+            Vector3f lc = light.getColor();
+            Color_t diff = blinnPhongDiffuse(n, l, kd, lc);
+            Color_t spec = blinnPhongSpecular(n, h, ks, power, lc);
+            color += diff;
+            color += spec;}
     }
 
     return color;
 }
 
-Color_t Renderer::cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
-    return {0, 0, 0};
+Color_t Renderer::blinnPhongDiffuse(Eigen::Vector3f &n, Eigen::Vector3f &l,
+    Eigen::Vector3f &kd, Eigen::Vector3f &lightColor)
+{
+    Vector3f temp = kd * fmaxf(0, n.dot(l));
+    temp = temp.cwiseProduct(lightColor);
+    return colorFromVector(temp);
 }
 
+Color_t Renderer::blinnPhongSpecular(Eigen::Vector3f &n, Eigen::Vector3f &h,
+    Eigen::Vector3f &ks, float power, Eigen::Vector3f &lightColor)
+{
+    Vector3f temp = ks * powf(fmaxf(0, h.dot(n)), power);
+
+    temp = temp.cwiseProduct(lightColor);
+    return colorFromVector(temp);
+}
+
+Color_t Renderer::cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
+    Vector3f pigment = object->color();
+
+    Vector3f ka = object->getFinish().ambient * pigment;
+
+    Color_t color = colorFromVector(ka);
+
+    // TODO implement Cook-Torrance shading
+
+    return color;
+}
 
 void Renderer::renderScene(std::string output) {
     shared_ptr<Geometry> hitObject;
@@ -95,8 +132,6 @@ void Renderer::renderScene(std::string output) {
             Ray r = scene->camera.rayToPixel(x, y);
             hitObject = scene->firstHit(r, t);
             if (hitObject) {
-                // Vector3f color = hitObject->color();
-                // pixels[width * (height - 1- y) + x] = colorFromVector(color);
                 pixels[width * (height - 1- y) + x] = calculateColor(r, t.value, hitObject);
             }
             else {

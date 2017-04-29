@@ -2,7 +2,10 @@
 #define RENDERER_H
 
 #include <vector>
+#include <memory>
 #include <Eigen/Dense>
+
+#include <iostream>
 
 struct Color_t {
     unsigned char r;
@@ -10,9 +13,9 @@ struct Color_t {
     unsigned char b;
 
     Color_t operator+=(const Color_t &rhs)  {
-        r += rhs.r;
-        g += rhs.g;
-        b += rhs.b;
+        r = r  + rhs.r > 255 ? 255 : r + rhs.r;
+        g = g  + rhs.g > 255 ? 255 : g + rhs.g;
+        b = b  + rhs.b > 255 ? 255 : b + rhs.b;
         return *this;
     }
 
@@ -38,6 +41,11 @@ private:
     Color_t calculateColor(Ray &r, float t, std::shared_ptr<Geometry> object);
     Color_t blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
     Color_t cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
+
+    Color_t blinnPhongDiffuse(Eigen::Vector3f &n, Eigen::Vector3f &l,
+        Eigen::Vector3f &kd, Eigen::Vector3f &lightColor);
+    Color_t blinnPhongSpecular(Eigen::Vector3f &n, Eigen::Vector3f &h,
+        Eigen::Vector3f &ks, float power, Eigen::Vector3f &lightColor);
 
 public:
     Renderer(Scene *sc);

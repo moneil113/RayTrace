@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "Ray.h"
 
-#define EPSILON 0.0001f
+#define EPSILON 0.001f
 
 using namespace std;
 

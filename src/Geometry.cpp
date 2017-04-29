@@ -20,6 +20,8 @@ std::string Geometry::to_string() {
     str << "- Material:\n";
     str << "  - Ambient: " << finish.ambient << "\n";
     str << "  - Diffuse: " << finish.diffuse << "\n";
+    str << "  - Specular: " << finish.specular << "\n";
+    str << "  - Roughness: " << finish.roughness << "\n";
     // for (size_t i = 0; i < transformTypes.size(); i++) {
     //     str << "        " << transformString(transformTypes.at(i));
     //     str << formatVector(transformValues.at(i)) << "\n";
