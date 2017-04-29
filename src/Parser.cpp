@@ -191,11 +191,7 @@ bool Parser::parseProperties(std::shared_ptr<Geometry> object, std::string line)
         object->pigment = parsePigment(line);
     }
     else if (line.find("finish") != string::npos) {
-        int start = line.find("ambient");
-        object->finish.ambient = readFloat(line.substr(start));
-        start = line.find("diffuse");
-        object->finish.diffuse = readFloat(line.substr(start));
-        object->finish.specular = 0;
+        parseFinish(object, line);
     }
     else if (line.find("translate") != string::npos) {
         object->addTransform(TRANSFORM_TRANSLATE, readVec3(line));
@@ -221,6 +217,27 @@ Eigen::Vector3f Parser::parsePigment(std::string line) {
     return readVec3(line.substr(start));
 }
 
+void Parser::parseFinish(std::shared_ptr<Geometry> object, std::string line) {
+    int start = line.find("ambient");
+    object->finish.ambient = readFloat(line.substr(start));
+    start = line.find("diffuse");
+    object->finish.diffuse = readFloat(line.substr(start));
+    start = line.find("specular");
+    if (start != string::npos) {
+        object->finish.specular = readFloat(line.substr(start));
+    }
+    else {
+        object->finish.specular = 0;
+    }
+    start = line.find("roughness");
+    if (start != string::npos) {
+        object->finish.roughness = readFloat(line.substr(start));
+    }
+    else {
+        object->finish.roughness = 0;
+    }
+}
+
 Eigen::Vector3f Parser::readVec3(std::string line) {
     float x, y, z;
     int start = line.find("<");
@@ -233,7 +250,16 @@ Eigen::Vector3f Parser::readVec3(std::string line) {
 
 float Parser::readFloat(std::string line) {
     float x;
-    sscanf(line.c_str(), "%*s%f", &x);
+    int start = line.find(",");
+
+    if (start != string::npos) {
+        string sub = line;
+        sub = line.substr(start + 1);
+        sscanf(sub.c_str(), " %f", &x);
+    }
+    else {
+        sscanf(line.c_str(), "%*s%f", &x);
+    }
 
     return x;
 }

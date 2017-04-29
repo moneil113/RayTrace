@@ -21,6 +21,7 @@ private:
     // Convenience functions
     bool parseProperties(std::shared_ptr<Geometry> object, std::string line);
     Eigen::Vector3f parsePigment(std::string line);
+    void parseFinish(std::shared_ptr<Geometry> object, std::string line);
     Eigen::Vector3f readVec3(std::string line);
     float readFloat(std::string line);
 

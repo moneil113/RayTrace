@@ -20,6 +20,7 @@ typedef struct {
     float ambient;
     float diffuse;
     float specular;
+    float roughness;
 } Finish_t;
 
 class Ray;
