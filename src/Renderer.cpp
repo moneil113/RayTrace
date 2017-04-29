@@ -19,9 +19,9 @@ Renderer::Renderer(Scene *sc) {
 
 Color_t Renderer::colorFromVector(Eigen::Vector3f &v) {
     Color_t color;
-    color.r = (unsigned char) round(v.x() * 255.f);
-    color.g = (unsigned char) round(v.y() * 255.f);
-    color.b = (unsigned char) round(v.z() * 255.f);
+    color.r = (unsigned char) fminf(round(v.x() * 255.f), 255);
+    color.g = (unsigned char) fminf(round(v.y() * 255.f), 255);
+    color.b = (unsigned char) fminf(round(v.z() * 255.f), 255);
 
     return color;
 }
@@ -89,7 +89,8 @@ Color_t Renderer::blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eige
             Vector3f diff = blinnPhongDiffuse(n, l, kd, lc);
             Vector3f spec = blinnPhongSpecular(n, h, ks, power, lc);
             color += diff;
-            color += spec;}
+            color += spec;
+        }
     }
 
     return colorFromVector(color);
