@@ -107,3 +107,23 @@ void Scene::firstHitTest(int x, int y) {
         cout << "No Hit" << '\n';
     }
 }
+
+void Scene::pixelColorTest(int x, int y) {
+    pixelTest(x, y);
+
+    floatOptional t;
+
+    Ray r = camera.rayToPixel(x, y);
+
+    std::shared_ptr<Geometry> objectHit = firstHit(r, t);
+
+    if (t.valid) {
+        cout << setprecision(4);
+        cout << "T = " << t.value << "\n";
+        cout << "Object Type: " << objectHit->type() << '\n';
+        renderer.pixelColorTest(x, y);
+    }
+    else {
+        cout << "No Hit" << '\n';
+    }
+}

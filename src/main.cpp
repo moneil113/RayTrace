@@ -42,6 +42,11 @@ int main(int argc, char const *argv[]) {
 
         sc->render("output.png");
     }
+    else if (strstr(argv[1], "pixelcolor")) {
+        sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
+
+        sc->pixelColorTest(atoi(argv[5]), atoi(argv[6]));
+    }
     else {
         std::cout << "usage: RayTrace <mode> <input file>" << '\n';
         exit(-1);

@@ -107,3 +107,21 @@ void Renderer::renderScene(std::string output) {
 
     stbi_write_png(output.c_str(), width, height, 3, pixels, width * sizeof(Color_t));
 }
+
+void Renderer::pixelColorTest(int x, int y) {
+    Ray r = scene->camera.rayToPixel(x, y);
+    floatOptional t;
+    shared_ptr<Geometry> hitObject = scene->firstHit(r, t);
+
+    if (hitObject) {
+        Color_t color = calculateColor(r, t.value, hitObject);
+        cout << "BRDF: ";
+        if (brdf == 0) {
+            cout << "Blinn-Phong\n";
+        }
+        else {
+            cout << "Cook-Torrance\n";
+        }
+        cout << "Color: " << color << "\n";
+    }
+}

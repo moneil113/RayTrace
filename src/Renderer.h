@@ -15,6 +15,11 @@ struct Color_t {
         b += rhs.b;
         return *this;
     }
+
+    friend std::ostream& operator<<(std::ostream &os, const Color_t &rhs)
+    {
+        return os << "(" << (int) rhs.r << " " << (int) rhs.g << " " << (int) rhs.b << ")";
+    }
 };
 
 class Scene;
@@ -40,6 +45,7 @@ public:
     void setBRDF(int type);
     void setImageSize(int width, int height);
     void renderScene(std::string output);
+    void pixelColorTest(int x, int y);
 
 };
 #endif
