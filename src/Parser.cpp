@@ -236,6 +236,20 @@ void Parser::parseFinish(std::shared_ptr<Geometry> object, std::string line) {
     else {
         object->finish.roughness = 0;
     }
+    start = line.find("metallic");
+    if (start != string::npos) {
+        object->finish.metallic = readFloat(line.substr(start));
+    }
+    else {
+        object->finish.metallic = 0;
+    }
+    start = line.find("ior");
+    if (start != string::npos) {
+        object->finish.ior = readFloat(line.substr(start));
+    }
+    else {
+        object->finish.ior = 0;
+    }
 }
 
 Eigen::Vector3f Parser::readVec3(std::string line) {

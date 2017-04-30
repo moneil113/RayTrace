@@ -21,6 +21,8 @@ typedef struct {
     float diffuse;
     float specular;
     float roughness;
+    float metallic;
+    float ior;
 } Finish_t;
 
 class Ray;

@@ -47,6 +47,11 @@ private:
     Eigen::Vector3f blinnPhongSpecular(Eigen::Vector3f &n, Eigen::Vector3f &h,
         Eigen::Vector3f &ks, float power, Eigen::Vector3f &lightColor);
 
+    float D_ggx(Eigen::Vector3f &m, Eigen::Vector3f &n, float alpha);
+    float G_ggx(Eigen::Vector3f &l, Eigen::Vector3f &v, Eigen::Vector3f &n, float alpha);
+    float G_ggxPart(Eigen::Vector3f &x, Eigen::Vector3f &m, Eigen::Vector3f &n, float alpha);
+    float fresnel(float ior, Eigen::Vector3f &v, Eigen::Vector3f &h);
+
 public:
     Renderer(Scene *sc);
 

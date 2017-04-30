@@ -76,6 +76,7 @@ Color_t Renderer::blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eige
         floatOptional t;
         Ray lightRay = Ray(p, l);
         hit = scene->firstHit(lightRay, t);
+        
         //Check if we hit something behind the light
         if (hit) {
             if ((light.getLocation() - p).norm() < t.value) {
@@ -116,12 +117,85 @@ Color_t Renderer::cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Ei
     Vector3f pigment = object->color();
 
     Vector3f ka = object->getFinish().ambient * pigment;
+    Vector3f kd = object->getFinish().diffuse * pigment;
+    Vector3f ks = object->getFinish().specular * pigment;
+    float roughness = object->getFinish().roughness;
 
-    Color_t color = colorFromVector(ka);
+    Vector3f color = ka;
 
-    // TODO implement Cook-Torrance shading
+    Vector3f n = object->normalAtPoint(p);
+    Vector3f v = -r.direction().normalized();
 
-    return color;
+    // for shadow
+    shared_ptr<Geometry> hit;
+
+    for (int i = 0; i < scene->lights.size(); i++) {
+        Light light = scene->lights.at(i);
+        Vector3f l = (light.getLocation() - p).normalized();
+        floatOptional t;
+        Ray lightRay = Ray(p, l);
+        hit = scene->firstHit(lightRay, t);
+
+        //Check if we hit something behind the light
+        if (hit) {
+            if ((light.getLocation() - p).norm() < t.value) {
+                hit = NULL;
+            }
+        }
+
+        if (!hit) {
+            Vector3f h = (v + l).normalized();
+            Vector3f lc = light.getColor();
+            Vector3f rd = kd * fmaxf(0, n.dot(l));
+
+            float d = D_ggx(h, n, roughness);
+
+            float g = G_ggx(l, v, n, roughness);
+
+            Finish_t finish = object->getFinish();
+            float ior = finish.ior;
+            float f = fresnel(ior, v, h);
+
+            Vector3f rs = ks * d * g * f / (4 * n.dot(v));
+
+            float s = finish.metallic;
+
+            color += lc.cwiseProduct(((1 - s) * rd + s * rs));
+        }
+    }
+
+    return colorFromVector(color);
+}
+
+float Renderer::D_ggx(Eigen::Vector3f &m, Eigen::Vector3f &n, float alpha) {
+    float m_n = m.dot(n);
+    float alpha2 = alpha * alpha;
+    float numerator = alpha2 * (m_n > 0);
+    float denominator = M_PI * m_n * m_n * powf((alpha2 + (1-(m_n * m_n)) / (m_n * m_n)), 2);
+
+    return numerator / denominator;
+}
+
+float Renderer::G_ggx(Eigen::Vector3f &l, Eigen::Vector3f &v, Eigen::Vector3f &n, float alpha) {
+    Vector3f h = (v + l).normalized();
+    return G_ggxPart(v, h, n, alpha) * G_ggxPart(l, h, n, alpha);
+}
+
+float Renderer::G_ggxPart(Eigen::Vector3f &x, Eigen::Vector3f &m, Eigen::Vector3f &n, float alpha) {
+    if (x.dot(n) / x.dot(m) > 0) {
+        float m_n = n.dot(m);
+        float tan2 = (1 - m_n * m_n)/(m_n * m_n);
+
+        return 2 / (1 + sqrtf(1 + alpha * alpha * tan2));
+    }
+    else {
+        return 0;
+    }
+}
+
+float Renderer::fresnel(float ior, Eigen::Vector3f &v, Eigen::Vector3f &h) {
+    float f0 = powf(ior - 1, 2) / powf(ior + 1, 2);
+    return f0 + (1 - f0) * powf((1 - (v.dot(h))), 5);
 }
 
 void Renderer::renderScene(std::string output) {
