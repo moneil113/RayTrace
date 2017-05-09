@@ -171,11 +171,11 @@ void Parser::parseTriangle() {
     bool done = false;
 
     getline(in, line);
-    t->corner1 = readVec3(line);
+    t->v1 = readVec3(line);
     getline(in, line);
-    t->corner2 = readVec3(line);
+    t->v2 = readVec3(line);
     getline(in, line);
-    t->corner3 = readVec3(line);
+    t->v3 = readVec3(line);
 
     while (getline(in, line) && !done) {
         done = parseProperties(t, line);
