@@ -13,6 +13,19 @@ private:
     Eigen::Vector3f normal;
     bool normSet = false;
 
+    void computeDeterminants();
+    bool determinantsSet = false;
+    Eigen::Matrix3f mat;
+
+    // determinants of submatrices excluding row 2, column 0, 1, 2
+    // compute these once, then just fetch them on subsequent calls
+    // (we can do this because det(A) == det(transpose(A)) )
+    // [[a, b, c],      [[a, d, g],
+    //  [d, e, f], =>    [b, e, h],     c(dh-eg)-f(ah-bg)+i(ae-bd)
+    //  [g, h, i]]       [c, f, i]]
+    // [a-b, a-c, d]
+    float det1, det2, det3;
+
 public:
     Triangle ();
 
