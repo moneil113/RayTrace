@@ -14,8 +14,8 @@ private:
 public:
     Light ();
 
-    Eigen::Vector3f getLocation() { return location; }
-    Eigen::Vector3f getColor() { return color; }
+    const Eigen::Vector3f &getLocation() const { return location; }
+    const Eigen::Vector3f &getColor() const { return color; }
 
     std::string to_string();
 };

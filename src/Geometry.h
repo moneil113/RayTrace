@@ -23,6 +23,8 @@ typedef struct {
     float roughness;
     float metallic;
     float ior;
+    float reflection;
+    float refraction;
 } Finish_t;
 
 class Ray;
@@ -33,6 +35,7 @@ friend class Parser;
 protected:
     Eigen::Vector3f pigment;
     Finish_t finish;
+    float filter;
 
     std::vector<Eigen::Vector3f> transformValues;
     std::vector<int> transformTypes;
@@ -45,7 +48,7 @@ public:
 
     void addTransform(int type, Eigen::Vector3f value);
     Eigen::Vector3f color() { return pigment; }
-    Finish_t getFinish() { return finish; }
+    const Finish_t &getFinish() { return finish; }
 
     // Tests for intersection. If there is no intersection, the floatOptional
     // will not be valid. If there is an intersection, the value of the

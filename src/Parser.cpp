@@ -188,7 +188,9 @@ bool Parser::parseProperties(std::shared_ptr<Geometry> object, std::string line)
     bool done = false;
 
     if (line.find("pigment") != string::npos) {
-        object->pigment = parsePigment(line);
+        Vector4f pigment = parsePigment(line);
+        object->pigment = pigment.head<3>();
+        object->filter = pigment[3];
     }
     else if (line.find("finish") != string::npos) {
         parseFinish(object, line);
@@ -212,44 +214,64 @@ bool Parser::parseProperties(std::shared_ptr<Geometry> object, std::string line)
     return done;
 }
 
-Eigen::Vector3f Parser::parsePigment(std::string line) {
-    int start = line.find("color");
-    return readVec3(line.substr(start));
+Eigen::Vector4f Parser::parsePigment(std::string line) {
+    int start = line.find("rbgf");
+    if (start != string::npos) {
+        return readVec4(line.substr(start));
+    }
+    start = line.find("rgb");
+    Vector4f ret;
+    ret << readVec3(line.substr(start)), 0;
+    return ret;
 }
 
 void Parser::parseFinish(std::shared_ptr<Geometry> object, std::string line) {
+    object->finish = {};
     int start = line.find("ambient");
     object->finish.ambient = readFloat(line.substr(start));
+
     start = line.find("diffuse");
     object->finish.diffuse = readFloat(line.substr(start));
+
     start = line.find("specular");
     if (start != string::npos) {
         object->finish.specular = readFloat(line.substr(start));
     }
-    else {
-        object->finish.specular = 0;
-    }
+
     start = line.find("roughness");
     if (start != string::npos) {
         object->finish.roughness = readFloat(line.substr(start));
     }
-    else {
-        object->finish.roughness = 0;
-    }
+
     start = line.find("metallic");
     if (start != string::npos) {
         object->finish.metallic = readFloat(line.substr(start));
     }
-    else {
-        object->finish.metallic = 0;
-    }
+
     start = line.find("ior");
     if (start != string::npos) {
         object->finish.ior = readFloat(line.substr(start));
     }
-    else {
-        object->finish.ior = 0;
+
+    start = line.find("reflection");
+    if (start != string::npos) {
+        object->finish.reflection = readFloat(line.substr(start));
     }
+
+    start = line.find("refraction");
+    if (start != string::npos) {
+        object->finish.refraction = readFloat(line.substr(start));
+    }
+}
+
+Eigen::Vector4f Parser::readVec4(std::string line) {
+    float x, y, z, f;
+    int start = line.find("<");
+    string sub = line.substr(start);
+    const char *str = sub.c_str();
+    sscanf(str, "<%f, %f, %f, %f>", &x, &y, &z, &f);
+
+    return Vector4f(x, y, z, f);
 }
 
 Eigen::Vector3f Parser::readVec3(std::string line) {

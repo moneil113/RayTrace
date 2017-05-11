@@ -27,6 +27,7 @@ struct Color_t {
 
 class Scene;
 class Ray;
+class Light;
 class Geometry;
 
 class Renderer {
@@ -34,13 +35,21 @@ private:
     Color_t *pixels;
     int width, height;
     int brdf;
+    Eigen::Vector3f (Renderer::*localColor)(Ray &r,
+        std::shared_ptr<Geometry> object, Eigen::Vector3f p) = NULL;
+
+    const int maxBounces = 6;
+    const float epsilon = 0.0001f;
 
     Scene *scene;
 
+    bool inShadow(const Eigen::Vector3f &point, const Light &light);
+
     Color_t colorFromVector(Eigen::Vector3f &v);
-    Color_t calculateColor(Ray &r, float t, std::shared_ptr<Geometry> object);
-    Color_t blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
-    Color_t cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
+    Eigen::Vector3f calculateColor(Ray &r, float t, std::shared_ptr<Geometry> object, int depth);
+
+    Eigen::Vector3f blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
+    Eigen::Vector3f cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
 
     Eigen::Vector3f blinnPhongDiffuse(Eigen::Vector3f &n, Eigen::Vector3f &l,
         Eigen::Vector3f &kd, Eigen::Vector3f &lightColor);

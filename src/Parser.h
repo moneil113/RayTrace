@@ -20,8 +20,9 @@ private:
     void parseTriangle();
     // Convenience functions
     bool parseProperties(std::shared_ptr<Geometry> object, std::string line);
-    Eigen::Vector3f parsePigment(std::string line);
+    Eigen::Vector4f parsePigment(std::string line);
     void parseFinish(std::shared_ptr<Geometry> object, std::string line);
+    Eigen::Vector4f readVec4(std::string line);
     Eigen::Vector3f readVec3(std::string line);
     float readFloat(std::string line);
 
