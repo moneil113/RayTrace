@@ -213,6 +213,9 @@ void Parser::parseProperties(std::shared_ptr<Geometry> object) {
         else {
             cerr << "bad property: " << line << '\n';
         }
+        if (line.find("}}") != string::npos) {
+            done = true;
+        }
     }
 }
 
