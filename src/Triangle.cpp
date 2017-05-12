@@ -90,6 +90,7 @@ floatOptional Triangle::intersect(Ray &r) {
 Eigen::Vector3f Triangle::normalAtPoint(Eigen::Vector3f p) {
     if (!normSet) {
         normal = (v2 - v1).cross(v3 - v2);
+        normal.normalize();
         normSet = true;
     }
     return normal;
