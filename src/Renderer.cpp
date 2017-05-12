@@ -81,6 +81,9 @@ Vector3f Renderer::reflect(const Ray &r, const Vector3f &p, const shared_ptr<Geo
 
     if (reflectObject) {
         Vector3f rp = reflectRay.getPoint(t.value);
+        if (trace) {
+            printRayInfo(reflectRay, reflectObject, 1, depth);
+        }
         return calculateColor(reflectRay, rp, reflectObject, depth + 1);
     }
     return Vector3f(0, 0, 0);
@@ -113,7 +116,14 @@ Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geo
             if (trace) {
                 printRayInfo(refractRay, object, 2, depth);
             }
-            return calculateColor(refractRay, rp, refractObject, depth + 1);
+            // Beer's law
+            Vector3f otherColor = calculateColor(refractRay, rp, refractObject, depth + 1);
+            Vector3f absorbance = (Vector3f(1, 1, 1) - object->color()) * 0.15 * -t.value;
+            Vector3f attnColor;
+            attnColor = otherColor.cwiseProduct(Vector3f(exp(absorbance.x()),
+                                                         exp(absorbance.y()),
+                                                         exp(absorbance.z())));
+            return attnColor;
         }
         else {
             if (trace) {
@@ -152,9 +162,6 @@ Vector3f Renderer::calculateColor(Ray &r, const Vector3f &p, shared_ptr<Geometry
         float reflectContribution = (1 - finish.filter) * finish.reflection;
         float refractContribution = finish.filter * (1 - finish.reflection);
 
-        // cout << "local:\n" << local << "\nat " << localContribution << endl;
-        // cout << "reflect:\n" << reflectColor << "\nat " << reflectContribution << endl;
-        // cout << "refract:\n" << refractColor << "\nat " << refractContribution << endl;
         return localContribution * local +
             reflectContribution * reflectColor +
             refractContribution * refractColor;
