@@ -51,8 +51,26 @@ int main(int argc, char const *argv[]) {
         if (argc == 8 && strstr(argv[7], "-altbrdf")) {
             sc->setBRDF(1);
         }
+        else {
+            sc->setBRDF(0);
+        }
 
         sc->pixelColorTest(atoi(argv[5]), atoi(argv[6]));
+    }
+    else if (strstr(argv[1], "pixeltrace")) {
+        if (argc != 7 && argc != 8) {
+            std::cout << "usage: raytrace pixelcolor <input file> <width> <height> <x> <y> [-altbrdf]" << '\n';
+            exit(-1);
+        }
+        sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
+        if (argc == 8 && strstr(argv[7], "-altbrdf")) {
+            sc->setBRDF(1);
+        }
+        else {
+            sc->setBRDF(0);
+        }
+
+        sc->pixelTraceTest(atoi(argv[5]), atoi(argv[6]));
     }
     else {
         std::cout << "usage: RayTrace <mode> <input file>" << '\n';

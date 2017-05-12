@@ -17,7 +17,7 @@ Renderer::Renderer(Scene *sc) {
     brdf = 0;
 }
 
-Color_t Renderer::colorFromVector(Eigen::Vector3f &v) {
+Color_t Renderer::colorFromVector(const Eigen::Vector3f &v) {
     Color_t color;
     color.r = (unsigned char) fminf(round(v.x() * 255.f), 255);
     color.g = (unsigned char) fminf(round(v.y() * 255.f), 255);
@@ -70,28 +70,87 @@ bool Renderer::inShadow(const Eigen::Vector3f &point, const Light &light) {
     return false;
 }
 
-Eigen::Vector3f Renderer::calculateColor(Ray &r, float t, std::shared_ptr<Geometry> object, int depth) {
-    Vector3f p = r.getPoint(t);
+Vector3f Renderer::reflect(const Ray &r, const Vector3f &p, const shared_ptr<Geometry> object, int depth) {
+    Vector3f d = r.direction();
+    Vector3f n = object->normalAtPoint(p);
+    Vector3f dir = (d - 2 * d.dot(n) * n).normalized();
+    Ray reflectRay = Ray(p + epsilon * dir, dir);
+
+    floatOptional t;
+    auto reflectObject = scene->firstHit(reflectRay, t);
+
+    if (reflectObject) {
+        Vector3f rp = reflectRay.getPoint(t.value);
+        return calculateColor(reflectRay, rp, reflectObject, depth + 1);
+    }
+    return Vector3f(0, 0, 0);
+}
+
+Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geometry> object, int depth, bool enter) {
+    Vector3f d = r.direction();
+    Vector3f n = object->normalAtPoint(p);
+    float ior = object->getFinish().ior;
+    float d_n = d.dot(n);
+
+    if (enter) {
+        ior = 1 / ior;
+        n = -n;
+    }
+
+    Vector3f t = (1 / ior) * (d + d.dot(n) * n);
+    t -= n * sqrtf(1 - (1 / ior) * (1 / ior) * (1 - d_n * d_n));
+    t.normalize();
+
+    Ray refractRay = Ray(p + epsilon * t, t);
+
+    if (!enter) {
+        cout << "exit" << endl;
+        floatOptional t;
+        auto refractObject = scene->firstHit(refractRay, t);
+        if (refractObject) {
+            Vector3f rp = refractRay.getPoint(t.value);
+            return calculateColor(refractRay, rp, refractObject, depth + 1);
+        }
+        else {
+            return Vector3f(0, 0, 0);
+        }
+    }
+    else {
+        cout << "enter" << endl;
+        floatOptional t = object->intersect(refractRay);
+        Vector3f rp = refractRay.getPoint(t.value);
+        return refract(refractRay, rp, object, depth + 1, false);
+        // return Vector3f(1, 1, 1);
+    }
+}
+
+Vector3f Renderer::calculateColor(Ray &r, const Vector3f &p, shared_ptr<Geometry> object, int depth) {
     Vector3f local = (this->*localColor)(r, object, p);
 
     if (depth <= maxBounces) {
-        Vector3f d = r.direction();
-        Vector3f n = object->normalAtPoint(p);
-        Ray reflectRay = Ray(p, (d - 2 * d.dot(n) * n).normalized());
-
-        floatOptional rt;
-        auto reflectObject = scene->firstHit(reflectRay, rt);
+        Finish_t finish = object->getFinish();
 
         Vector3f reflectColor;
-        if (reflectObject) {
-            reflectColor = calculateColor(reflectRay, rt.value, reflectObject, depth + 1);
-        }
-        else {
-            reflectColor << 0, 0, 0;
+        if (finish.reflection > 0) {
+            reflectColor = reflect(r, p, object, depth);
         }
 
-        Finish_t finish = object->getFinish();
-        return (1 - finish.reflection) * local + finish.reflection * reflectColor;
+        Vector3f refractColor;
+        if (finish.filter > 0) {
+            // cout << "refract" << endl;
+            refractColor = refract(r, p, object, depth, true);
+        }
+
+        // Vector3f refractColor;
+        // cout << depth << endl;
+        // cout << "reflect contribution:\n" << reflectColor << "\nat " << finish.reflection << endl;
+        // cout << "local contribution:\n" << local << "\nat " << (1 - finish.reflection) << endl;
+        float localContribution = (1 - finish.filter) * (1 - finish.reflection);
+        float reflectContribution = (1 - finish.filter) * finish.reflection;
+        float refractContribution = finish.filter * (1 - finish.reflection);
+        return localContribution * local +
+            reflectContribution * reflectColor +
+            refractContribution * refractColor;
     }
     else {
         return local;
@@ -225,7 +284,8 @@ void Renderer::renderScene(std::string output) {
             Ray r = scene->camera.rayToPixel(x, y);
             hitObject = scene->firstHit(r, t);
             if (hitObject) {
-                Vector3f col = calculateColor(r, t.value, hitObject, 0);
+                Vector3f p = r.getPoint(t.value);
+                Vector3f col = calculateColor(r, p, hitObject, 0);
                 pixels[width * (height - 1- y) + x] = colorFromVector(col);
             }
             else {
@@ -243,7 +303,8 @@ void Renderer::pixelColorTest(int x, int y) {
     shared_ptr<Geometry> hitObject = scene->firstHit(r, t);
 
     if (hitObject) {
-        Vector3f col = calculateColor(r, t.value, hitObject, 0);
+        Vector3f p = r.getPoint(t.value);
+        Vector3f col = calculateColor(r, p, hitObject, 0);
         Color_t color = colorFromVector(col);
         cout << "BRDF: ";
         if (brdf == 0) {
@@ -254,4 +315,41 @@ void Renderer::pixelColorTest(int x, int y) {
         }
         cout << "Color: " << color << "\n";
     }
+}
+
+void Renderer::pixelTraceTest(int x, int y) {
+    trace = true;
+    Ray r = scene->camera.rayToPixel(x, y);
+    floatOptional t;
+    auto hitObject = scene->firstHit(r, t);
+
+    if (hitObject) {
+        Vector3f p = r.getPoint(t.value);
+        calculateColor(r, p, hitObject, 0);
+    }
+    else {
+        cout << "no hit\n";
+    }
+}
+
+void Renderer::printRayInfo(const Ray &r, const Vector3f &color, int type, int depth) {
+    string indent = "";
+    for (int i = 0; i < depth; i++) {
+        indent += " ";
+    }
+    if (type == 0) {
+        cout << "o - Type: Primary\n";
+    }
+    else if (type == 1) {
+        cout << indent << "\\\n";
+        indent = " " + indent;
+        cout << indent << "o - Type: Reflection\n";
+    }
+    else if (type == 2) {
+        cout << indent << "\\\n";
+        indent += "|";
+        cout << "o - Type: Refraction\n";
+    }
+    cout << indent << "|   Ray: " << r.to_string() << endl;
+    cout << indent << "|   Color: " << color.x() << ", " << color.y() << ", " << color.z() << endl;;
 }

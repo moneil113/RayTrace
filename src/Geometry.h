@@ -24,7 +24,7 @@ typedef struct {
     float metallic;
     float ior;
     float reflection;
-    float refraction;
+    float filter;
 } Finish_t;
 
 class Ray;
@@ -35,7 +35,6 @@ friend class Parser;
 protected:
     Eigen::Vector3f pigment;
     Finish_t finish;
-    float filter;
 
     std::vector<Eigen::Vector3f> transformValues;
     std::vector<int> transformTypes;

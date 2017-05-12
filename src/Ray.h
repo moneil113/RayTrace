@@ -11,11 +11,11 @@ private:
 public:
     Ray(Eigen::Vector3f origin, Eigen::Vector3f direction);
 
-    Eigen::Vector3f &origin() { return _origin; }
-    Eigen::Vector3f &direction() { return _direction; }
+    const Eigen::Vector3f &origin() const { return _origin; }
+    const Eigen::Vector3f &direction() const { return _direction; }
     Eigen::Vector3f getPoint(float t);
 
-    std::string to_string();
+    std::string to_string() const;
 };
 
 #endif

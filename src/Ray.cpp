@@ -19,7 +19,7 @@ std::string formatVector(Eigen::Vector3f v) {
     return str.str();
 }
 
-std::string Ray::to_string() {
+std::string Ray::to_string() const {
     std::stringstream str;
     str << "{" << formatVector(_origin) << "} -> {" << formatVector(_direction) << "}";
     return str.str();

@@ -127,3 +127,7 @@ void Scene::pixelColorTest(int x, int y) {
         cout << "No Hit" << '\n';
     }
 }
+
+void Scene::pixelTraceTest(int x, int y) {
+    renderer.pixelTraceTest(x, y);
+}

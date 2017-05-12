@@ -104,12 +104,12 @@ void Parser::parseSphere(std::string l) {
     int start = l.find(">");
     s->radius = readFloat(l.substr(start));
 
-    string line;
-    bool done = false;
+    // string line;
+    // bool done = false;
 
-    while (getline(in, line) && !done) {
-        done = parseProperties(s, line);
-    }
+    // while (getline(in, line) && !done) {
+    parseProperties(s);
+    // }
 
     scene->addGeometry(s);
 }
@@ -120,12 +120,12 @@ void Parser::parsePlane(std::string l) {
     int start = l.find(">");
     p->distance = readFloat(l.substr(start));
 
-    string line;
-    bool done = false;
+    // string line;
+    // bool done = false;
 
-    while (getline(in, line) && !done) {
-        done = parseProperties(p, line);
-    }
+    // while (getline(in, line) && !done) {
+        parseProperties(p);
+    // }
 
     scene->addGeometry(p);
 }
@@ -136,12 +136,12 @@ void Parser::parseBox(std::string l) {
     int start = l.find(">");
     b->corner2 = readVec3(l.substr(start));
 
-    string line;
-    bool done = false;
+    // string line;
+    // bool done = false;
 
-    while (getline(in, line) && !done) {
-        done = parseProperties(b, line);
-    }
+    // while (getline(in, line) && !done) {
+    parseProperties(b);
+    // }
 
     scene->addGeometry(b);
 }
@@ -155,12 +155,12 @@ void Parser::parseCone(std::string l) {
     start = l.rfind(">");
     c->capRadius = readFloat(l.substr(start));
 
-    string line;
-    bool done = false;
+    // string line;
+    // bool done = false;
 
-    while (getline(in, line) && !done) {
-        done = parseProperties(c, line);
-    }
+    // while (getline(in, line) && !done) {
+    parseProperties(c);
+    // }
 
     scene->addGeometry(c);
 }
@@ -168,7 +168,7 @@ void Parser::parseCone(std::string l) {
 void Parser::parseTriangle() {
     shared_ptr<Triangle> t = make_shared<Triangle>();
     string line;
-    bool done = false;
+    // bool done = false;
 
     getline(in, line);
     t->v1 = readVec3(line);
@@ -177,45 +177,47 @@ void Parser::parseTriangle() {
     getline(in, line);
     t->v3 = readVec3(line);
 
-    while (getline(in, line) && !done) {
-        done = parseProperties(t, line);
-    }
+    // while (getline(in, line) && !done) {
+    parseProperties(t);
+    // }
 
     scene->addGeometry(t);
 }
 
-bool Parser::parseProperties(std::shared_ptr<Geometry> object, std::string line) {
+void Parser::parseProperties(std::shared_ptr<Geometry> object) {
     bool done = false;
+    object->finish = {};
+    string line;
 
-    if (line.find("pigment") != string::npos) {
-        Vector4f pigment = parsePigment(line);
-        object->pigment = pigment.head<3>();
-        object->filter = pigment[3];
+    while (getline(in, line) && !done) {
+        if (line.find("pigment") != string::npos) {
+            Vector4f pigment = parsePigment(line);
+            object->pigment = pigment.head<3>();
+            object->finish.filter = pigment[3];
+        }
+        else if (line.find("finish") != string::npos) {
+            parseFinish(object, line);
+        }
+        else if (line.find("translate") != string::npos) {
+            object->addTransform(TRANSFORM_TRANSLATE, readVec3(line));
+        }
+        else if (line.find("rotate") != string::npos) {
+            object->addTransform(TRANSFORM_ROTATE, readVec3(line));
+        }
+        else if (line.find("scale") != string::npos) {
+            object->addTransform(TRANSFORM_SCALE, readVec3(line));
+        }
+        else if (line.find("}") != string::npos) {
+            done = true;
+        }
+        else {
+            cerr << "bad property: " << line << '\n';
+        }
     }
-    else if (line.find("finish") != string::npos) {
-        parseFinish(object, line);
-    }
-    else if (line.find("translate") != string::npos) {
-        object->addTransform(TRANSFORM_TRANSLATE, readVec3(line));
-    }
-    else if (line.find("rotate") != string::npos) {
-        object->addTransform(TRANSFORM_ROTATE, readVec3(line));
-    }
-    else if (line.find("scale") != string::npos) {
-        object->addTransform(TRANSFORM_SCALE, readVec3(line));
-    }
-    else if (line.find("}") != string::npos) {
-        done = true;
-    }
-    else {
-        cerr << "bad property: " << line << '\n';
-    }
-
-    return done;
 }
 
 Eigen::Vector4f Parser::parsePigment(std::string line) {
-    int start = line.find("rbgf");
+    int start = line.find("rgbf");
     if (start != string::npos) {
         return readVec4(line.substr(start));
     }
@@ -226,7 +228,6 @@ Eigen::Vector4f Parser::parsePigment(std::string line) {
 }
 
 void Parser::parseFinish(std::shared_ptr<Geometry> object, std::string line) {
-    object->finish = {};
     int start = line.find("ambient");
     object->finish.ambient = readFloat(line.substr(start));
 
@@ -256,11 +257,6 @@ void Parser::parseFinish(std::shared_ptr<Geometry> object, std::string line) {
     start = line.find("reflection");
     if (start != string::npos) {
         object->finish.reflection = readFloat(line.substr(start));
-    }
-
-    start = line.find("refraction");
-    if (start != string::npos) {
-        object->finish.refraction = readFloat(line.substr(start));
     }
 }
 

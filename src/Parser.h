@@ -19,7 +19,7 @@ private:
     void parseCone(std::string line);
     void parseTriangle();
     // Convenience functions
-    bool parseProperties(std::shared_ptr<Geometry> object, std::string line);
+    void parseProperties(std::shared_ptr<Geometry> object);
     Eigen::Vector4f parsePigment(std::string line);
     void parseFinish(std::shared_ptr<Geometry> object, std::string line);
     Eigen::Vector4f readVec4(std::string line);

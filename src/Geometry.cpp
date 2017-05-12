@@ -25,7 +25,7 @@ std::string Geometry::to_string() {
     str << "  - Metallic: " << finish.metallic << "\n";
     str << "  - IOR: " << finish.ior << "\n";
     str << "  - Reflection: " << finish.reflection << "\n";
-    str << "  - refraction: " << finish.refraction << "\n";
+    str << "  - Refraction: " << finish.filter << "\n";
     // for (size_t i = 0; i < transformTypes.size(); i++) {
     //     str << "        " << transformString(transformTypes.at(i));
     //     str << formatVector(transformValues.at(i)) << "\n";

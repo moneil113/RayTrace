@@ -39,14 +39,21 @@ private:
         std::shared_ptr<Geometry> object, Eigen::Vector3f p) = NULL;
 
     const int maxBounces = 6;
-    const float epsilon = 0.0001f;
+    const float epsilon = 0.001f;
+    bool trace = false;
 
     Scene *scene;
 
     bool inShadow(const Eigen::Vector3f &point, const Light &light);
 
-    Color_t colorFromVector(Eigen::Vector3f &v);
-    Eigen::Vector3f calculateColor(Ray &r, float t, std::shared_ptr<Geometry> object, int depth);
+    Color_t colorFromVector(const Eigen::Vector3f &v);
+    Eigen::Vector3f calculateColor(Ray &r, const Eigen::Vector3f &p,
+        std::shared_ptr<Geometry> object, int depth);
+
+    Eigen::Vector3f reflect(const Ray &r, const Eigen::Vector3f &p,
+        const std::shared_ptr<Geometry> object, int depth);
+    Eigen::Vector3f refract(const Ray &r, const Eigen::Vector3f &p,
+        const std::shared_ptr<Geometry> object, int depth, bool enter);
 
     Eigen::Vector3f blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
     Eigen::Vector3f cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
@@ -61,6 +68,8 @@ private:
     float G_ggxPart(Eigen::Vector3f &x, Eigen::Vector3f &m, Eigen::Vector3f &n, float alpha);
     float fresnel(float ior, Eigen::Vector3f &v, Eigen::Vector3f &h);
 
+    void printRayInfo(const Ray &r, const Eigen::Vector3f &color, int type, int depth);
+
 public:
     Renderer(Scene *sc);
 
@@ -68,6 +77,7 @@ public:
     void setImageSize(int width, int height);
     void renderScene(std::string output);
     void pixelColorTest(int x, int y);
+    void pixelTraceTest(int x, int y);
 
 };
 #endif
