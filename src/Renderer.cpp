@@ -89,22 +89,23 @@ Vector3f Renderer::reflect(const Ray &r, const Vector3f &p, const shared_ptr<Geo
 Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geometry> object, int depth, bool enter) {
     Vector3f d = r.direction();
     Vector3f n = object->normalAtPoint(p);
-    float ior = object->getFinish().ior;
+    float n2 = object->getFinish().ior;
+    float n1_n2 = 1 / n2;
     float d_n = d.dot(n);
 
-    if (enter) {
-        ior = 1 / ior;
+    if (!enter) {
+        n1_n2 = n2;
         n = -n;
     }
 
-    Vector3f t = (1 / ior) * (d + d.dot(n) * n);
-    t -= n * sqrtf(1 - (1 / ior) * (1 / ior) * (1 - d_n * d_n));
+    Vector3f t = (n1_n2) * (d + d.dot(n) * n);
+    t -= n * sqrtf(1 - (n1_n2) * (n1_n2 * n1_n2) * (1 - d_n * d_n));
     t.normalize();
 
     Ray refractRay = Ray(p + epsilon * t, t);
 
     if (!enter) {
-        cout << "exit" << endl;
+        // exiting the object
         floatOptional t;
         auto refractObject = scene->firstHit(refractRay, t);
         if (refractObject) {
@@ -116,11 +117,9 @@ Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geo
         }
     }
     else {
-        cout << "enter" << endl;
         floatOptional t = object->intersect(refractRay);
         Vector3f rp = refractRay.getPoint(t.value);
         return refract(refractRay, rp, object, depth + 1, false);
-        // return Vector3f(1, 1, 1);
     }
 }
 
@@ -137,17 +136,16 @@ Vector3f Renderer::calculateColor(Ray &r, const Vector3f &p, shared_ptr<Geometry
 
         Vector3f refractColor;
         if (finish.filter > 0) {
-            // cout << "refract" << endl;
             refractColor = refract(r, p, object, depth, true);
         }
 
-        // Vector3f refractColor;
-        // cout << depth << endl;
-        // cout << "reflect contribution:\n" << reflectColor << "\nat " << finish.reflection << endl;
-        // cout << "local contribution:\n" << local << "\nat " << (1 - finish.reflection) << endl;
         float localContribution = (1 - finish.filter) * (1 - finish.reflection);
         float reflectContribution = (1 - finish.filter) * finish.reflection;
         float refractContribution = finish.filter * (1 - finish.reflection);
+
+        // cout << "local:\n" << local << "\nat " << localContribution << endl;
+        // cout << "reflect:\n" << reflectColor << "\nat " << reflectContribution << endl;
+        // cout << "refract:\n" << refractColor << "\nat " << refractContribution << endl;
         return localContribution * local +
             reflectContribution * reflectColor +
             refractContribution * refractColor;
