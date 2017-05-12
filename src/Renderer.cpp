@@ -89,17 +89,17 @@ Vector3f Renderer::reflect(const Ray &r, const Vector3f &p, const shared_ptr<Geo
 Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geometry> object, int depth, bool enter) {
     Vector3f d = r.direction();
     Vector3f n = object->normalAtPoint(p);
-    float n2 = object->getFinish().ior;
-    float n1_n2 = 1 / n2;
-    float d_n = d.dot(n);
+    float ior = object->getFinish().ior;
+    float n1_n2 = 1 / ior;
 
     if (!enter) {
-        n1_n2 = n2;
+        n1_n2 = ior;
         n = -n;
     }
+    float d_n = d.dot(n);
 
-    Vector3f t = (n1_n2) * (d + d.dot(n) * n);
-    t -= n * sqrtf(1 - (n1_n2) * (n1_n2 * n1_n2) * (1 - d_n * d_n));
+    Vector3f t = (n1_n2) * (d - d_n * n);
+    t -= n * sqrtf(1 - (n1_n2 * n1_n2) * (1 - d_n * d_n));
     t.normalize();
 
     Ray refractRay = Ray(p + epsilon * t, t);
@@ -110,15 +110,24 @@ Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geo
         auto refractObject = scene->firstHit(refractRay, t);
         if (refractObject) {
             Vector3f rp = refractRay.getPoint(t.value);
+            if (trace) {
+                printRayInfo(refractRay, object, 2, depth);
+            }
             return calculateColor(refractRay, rp, refractObject, depth + 1);
         }
         else {
+            if (trace) {
+                printRayInfo(refractRay, object, 2, depth);
+            }
             return Vector3f(0, 0, 0);
         }
     }
     else {
         floatOptional t = object->intersect(refractRay);
         Vector3f rp = refractRay.getPoint(t.value);
+        if (trace) {
+            printRayInfo(refractRay, object, 2, depth);
+        }
         return refract(refractRay, rp, object, depth + 1, false);
     }
 }
@@ -323,6 +332,7 @@ void Renderer::pixelTraceTest(int x, int y) {
 
     if (hitObject) {
         Vector3f p = r.getPoint(t.value);
+        printRayInfo(r, hitObject, 0, 0);
         calculateColor(r, p, hitObject, 0);
     }
     else {
@@ -330,7 +340,7 @@ void Renderer::pixelTraceTest(int x, int y) {
     }
 }
 
-void Renderer::printRayInfo(const Ray &r, const Vector3f &color, int type, int depth) {
+void Renderer::printRayInfo(const Ray &r, std::shared_ptr<Geometry> object, int type, int depth) {
     string indent = "";
     for (int i = 0; i < depth; i++) {
         indent += " ";
@@ -345,9 +355,17 @@ void Renderer::printRayInfo(const Ray &r, const Vector3f &color, int type, int d
     }
     else if (type == 2) {
         cout << indent << "\\\n";
-        indent += "|";
-        cout << "o - Type: Refraction\n";
+        indent += " ";
+        cout << indent << "o - Type: Refraction\n";
     }
+    floatOptional t;
+    t = object->intersect(r);
+    Vector3f p = r.getPoint(t.value);
+    Vector3f n = object->normalAtPoint(p);
     cout << indent << "|   Ray: " << r.to_string() << endl;
-    cout << indent << "|   Color: " << color.x() << ", " << color.y() << ", " << color.z() << endl;;
+    cout << indent << "|   Hit " << object->type();
+    cout << " at T = " << t.value << ", " << object->formatVector(p) << endl;;
+    cout << indent << "|   Normal: " << object->formatVector(n) << endl;;
+
+    // cout << indent << "|   Color: " << color.x() << ", " << color.y() << ", " << color.z() << endl;;
 }

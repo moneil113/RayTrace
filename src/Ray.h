@@ -13,7 +13,7 @@ public:
 
     const Eigen::Vector3f &origin() const { return _origin; }
     const Eigen::Vector3f &direction() const { return _direction; }
-    Eigen::Vector3f getPoint(float t);
+    Eigen::Vector3f getPoint(float t) const;
 
     std::string to_string() const;
 };

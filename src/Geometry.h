@@ -52,7 +52,7 @@ public:
     // Tests for intersection. If there is no intersection, the floatOptional
     // will not be valid. If there is an intersection, the value of the
     // floatOptional will be the closest nonnegative t value of the input ray.
-    virtual floatOptional intersect(Ray &r) = 0;
+    virtual floatOptional intersect(const Ray &r) = 0;
 
     // Given a point on the surface, return the normal
     // Assumes that the given point is on the surface of the object

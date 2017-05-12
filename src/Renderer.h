@@ -68,7 +68,7 @@ private:
     float G_ggxPart(Eigen::Vector3f &x, Eigen::Vector3f &m, Eigen::Vector3f &n, float alpha);
     float fresnel(float ior, Eigen::Vector3f &v, Eigen::Vector3f &h);
 
-    void printRayInfo(const Ray &r, const Eigen::Vector3f &color, int type, int depth);
+    void printRayInfo(const Ray &r, std::shared_ptr<Geometry> object, int type, int depth);
 
 public:
     Renderer(Scene *sc);

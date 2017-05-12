@@ -24,7 +24,7 @@ std::string Plane::type() {
     return "Plane";
 }
 
-floatOptional Plane::intersect(Ray &r) {
+floatOptional Plane::intersect(const Ray &r) {
     if (r.direction().dot(normal) == 0) {
         return {false, 0.0f};
     }

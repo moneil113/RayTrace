@@ -7,7 +7,7 @@ Ray::Ray(Eigen::Vector3f origin, Eigen::Vector3f direction) {
     _direction = direction.normalized();
 }
 
-Eigen::Vector3f Ray::getPoint(float t) {
+Eigen::Vector3f Ray::getPoint(float t) const {
     return _origin + t * _direction;
 }
 
