@@ -20,6 +20,7 @@ public:
     Camera();
 
     Ray rayToPixel(int x, int y);
+    Ray rayToSubPixel(int x, int y, int subX, int subY, int samples);
 
     void setImageSize(int width, int height);
     std::string to_string();

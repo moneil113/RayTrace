@@ -2,6 +2,25 @@
 #include <memory>
 #include "Parser.h"
 
+void parseOptionalArgs(std::shared_ptr<Scene> sc, const char *argv[], int start, int len) {
+    for (int i = start; i < len; i++) {
+        if (strstr(argv[i], "-altbrdf")) {
+            sc->setBRDF(1);
+        }
+        else if (strstr(argv[i], "-ss=")) {
+            int n;
+            sscanf(argv[i], "-ss=%d", &n);
+            sc->setSuperSamples(n);
+        }
+        else if (strstr(argv[i], "-fresnel")) {
+            // set fresnel
+        }
+        else {
+            std::cout << "Unknown optional argument: " << argv[i] << '\n';
+        }
+    }
+}
+
 int main(int argc, char const *argv[]) {
     if (argc < 3) {
         std::cout << "usage: RayTrace <mode> <input file>" << '\n';
@@ -33,12 +52,7 @@ int main(int argc, char const *argv[]) {
             exit(-1);
         }
         sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
-        if (argc == 6 && strstr(argv[5], "-altbrdf")) {
-            sc->setBRDF(1);
-        }
-        else {
-            sc->setBRDF(0);
-        }
+        parseOptionalArgs(sc, argv, 5, argc);
 
         sc->render("output.png");
     }
@@ -48,12 +62,7 @@ int main(int argc, char const *argv[]) {
             exit(-1);
         }
         sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
-        if (argc == 8 && strstr(argv[7], "-altbrdf")) {
-            sc->setBRDF(1);
-        }
-        else {
-            sc->setBRDF(0);
-        }
+        parseOptionalArgs(sc, argv, 5, argc);
 
         sc->pixelColorTest(atoi(argv[5]), atoi(argv[6]));
     }
@@ -63,12 +72,7 @@ int main(int argc, char const *argv[]) {
             exit(-1);
         }
         sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
-        if (argc == 8 && strstr(argv[7], "-altbrdf")) {
-            sc->setBRDF(1);
-        }
-        else {
-            sc->setBRDF(0);
-        }
+        parseOptionalArgs(sc, argv, 7, argc);
 
         sc->pixelTraceTest(atoi(argv[5]), atoi(argv[6]));
     }

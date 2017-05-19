@@ -15,6 +15,7 @@ Renderer::Renderer(Scene *sc) {
     pixels = NULL;
     scene = sc;
     brdf = 0;
+    localColor = &Renderer::blinnPhongColor;
 }
 
 Color_t Renderer::colorFromVector(const Eigen::Vector3f &v) {
@@ -35,7 +36,7 @@ void Renderer::setBRDF(int type) {
         localColor = &Renderer::cookTorranceColor;
     }
     else {
-        std::cerr << "Unkown brdf. Exiting" << '\n';
+        std::cerr << "Unknown brdf. Exiting" << '\n';
         exit(-1);
     }
 }
@@ -48,6 +49,10 @@ void Renderer::setImageSize(int width, int height) {
     pixels = new Color_t[width * height];
     this->width = width;
     this->height = height;
+}
+
+void Renderer::setSuperSamples(int n) {
+    superSamples = n;
 }
 
 bool Renderer::inShadow(const Eigen::Vector3f &point, const Light &light) {
@@ -142,7 +147,7 @@ Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geo
     }
 }
 
-Vector3f Renderer::calculateColor(Ray &r, const Vector3f &p, shared_ptr<Geometry> object, int depth) {
+Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Geometry> object, int depth) {
     Vector3f local = (this->*localColor)(r, object, p);
 
     if (depth <= maxBounces) {
@@ -163,7 +168,7 @@ Vector3f Renderer::calculateColor(Ray &r, const Vector3f &p, shared_ptr<Geometry
         float refractContribution = finish.filter * (1 - finish.reflection);
 
         return localContribution * local +
-            reflectContribution * reflectColor +
+            reflectContribution * reflectColor.cwiseProduct(object->color()) +
             refractContribution * refractColor;
     }
     else {
@@ -171,7 +176,7 @@ Vector3f Renderer::calculateColor(Ray &r, const Vector3f &p, shared_ptr<Geometry
     }
 }
 
-Eigen::Vector3f Renderer::blinnPhongColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
+Eigen::Vector3f Renderer::blinnPhongColor(const Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
     Vector3f pigment = object->color();
 
     Vector3f ka = object->getFinish().ambient * pigment;
@@ -218,7 +223,7 @@ Vector3f Renderer::blinnPhongSpecular(Eigen::Vector3f &n, Eigen::Vector3f &h,
     return temp;
 }
 
-Eigen::Vector3f Renderer::cookTorranceColor(Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
+Eigen::Vector3f Renderer::cookTorranceColor(const Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
     Vector3f pigment = object->color();
 
     Vector3f ka = object->getFinish().ambient * pigment;
@@ -250,7 +255,7 @@ Eigen::Vector3f Renderer::cookTorranceColor(Ray &r, std::shared_ptr<Geometry> ob
 
             Vector3f rs = ks * d * g * f / (4 * n.dot(v));
 
-            float s = finish.metallic;
+            float s = finish.specular;
 
             color += lc.cwiseProduct(((1 - s) * rd + s * rs));
         }
@@ -290,21 +295,49 @@ float Renderer::fresnel(float ior, Eigen::Vector3f &v, Eigen::Vector3f &h) {
     return f0 + (1 - f0) * powf((1 - (v.dot(h))), 5);
 }
 
-void Renderer::renderScene(std::string output) {
-    shared_ptr<Geometry> hitObject;
+Eigen::Vector3f Renderer::pixelColor(int x, int y) {
     floatOptional t;
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            Ray r = scene->camera.rayToPixel(x, y);
-            hitObject = scene->firstHit(r, t);
+    const Ray r = scene->camera.rayToPixel(x, y);
+    const auto hitObject = scene->firstHit(r, t);
+
+    if (hitObject) {
+        Vector3f p = r.getPoint(t.value);
+        return calculateColor(r, p, hitObject, 0);
+    }
+    else {
+        return Vector3f(0, 0, 0);
+    }
+}
+
+Eigen::Vector3f Renderer::averagePixelColor(int x, int y) {
+    floatOptional t;
+    Vector3f color(0, 0, 0);
+    for (int subX = 0; subX < superSamples; subX++) {
+        for (int subY = 0; subY < superSamples; subY++) {
+            const Ray r = scene->camera.rayToSubPixel(x, y, subX, subY, superSamples);
+            const auto hitObject = scene->firstHit(r, t);
             if (hitObject) {
                 Vector3f p = r.getPoint(t.value);
-                Vector3f col = calculateColor(r, p, hitObject, 0);
-                pixels[width * (height - 1- y) + x] = colorFromVector(col);
+                color += calculateColor(r, p, hitObject, 0);
+            }
+        }
+    }
+
+    return color / (superSamples * superSamples);
+}
+
+void Renderer::renderScene(std::string output) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            Vector3f color;
+            if (superSamples != 1) {
+                color = averagePixelColor(x, y);
             }
             else {
-                pixels[width * (height - 1- y) + x] = {0, 0, 0};
+                color = pixelColor(x, y);
             }
+
+            pixels[width * (height - 1 - y) + x] = colorFromVector(color);
         }
     }
 

@@ -47,6 +47,10 @@ void Scene::setBRDF(int type) {
     renderer.setBRDF(type);
 }
 
+void Scene::setSuperSamples(int n) {
+    renderer.setSuperSamples(n);
+}
+
 void Scene::addLight(Light l) {
     lights.push_back(l);
 }
