@@ -32,7 +32,7 @@ std::shared_ptr<Scene> Parser::parse() {
             // do nothing
         }
         else if (line.find("camera") != string::npos) {
-            parseCamera();
+            parseCamera(line);
         }
         else if (line.find("light_source") != string::npos) {
             parseLight_source(line);
@@ -60,12 +60,12 @@ std::shared_ptr<Scene> Parser::parse() {
     return scene;
 }
 
-void Parser::parseCamera() {
+void Parser::parseCamera(std::string line) {
     Camera cam;
-    string line;
+    // string line;
     bool done = false;
 
-    while (getline(in, line) && !done) {
+    do {
         if (line.find("location") != string::npos) {
             cam.location = readVec3(line);
         }
@@ -81,10 +81,13 @@ void Parser::parseCamera() {
         else if (line.find("}") != string::npos) {
             done = true;
         }
+        else if (line.find("camera") != string::npos) {
+            // do nothing
+        }
         else {
             cerr << "bad property: " << line << "\n";
         }
-    }
+    } while (getline(in, line) && !done);
 
     scene->setCamera(cam);
 }
@@ -104,12 +107,7 @@ void Parser::parseSphere(std::string l) {
     int start = l.find(">");
     s->radius = readFloat(l.substr(start));
 
-    // string line;
-    // bool done = false;
-
-    // while (getline(in, line) && !done) {
     parseProperties(s);
-    // }
 
     scene->addGeometry(s);
 }
@@ -120,12 +118,7 @@ void Parser::parsePlane(std::string l) {
     int start = l.find(">");
     p->distance = readFloat(l.substr(start));
 
-    // string line;
-    // bool done = false;
-
-    // while (getline(in, line) && !done) {
-        parseProperties(p);
-    // }
+    parseProperties(p);
 
     scene->addGeometry(p);
 }
@@ -136,12 +129,7 @@ void Parser::parseBox(std::string l) {
     int start = l.find(">");
     b->corner2 = readVec3(l.substr(start));
 
-    // string line;
-    // bool done = false;
-
-    // while (getline(in, line) && !done) {
     parseProperties(b);
-    // }
 
     scene->addGeometry(b);
 }
@@ -155,12 +143,7 @@ void Parser::parseCone(std::string l) {
     start = l.rfind(">");
     c->capRadius = readFloat(l.substr(start));
 
-    // string line;
-    // bool done = false;
-
-    // while (getline(in, line) && !done) {
     parseProperties(c);
-    // }
 
     scene->addGeometry(c);
 }
@@ -168,7 +151,6 @@ void Parser::parseCone(std::string l) {
 void Parser::parseTriangle() {
     shared_ptr<Triangle> t = make_shared<Triangle>();
     string line;
-    // bool done = false;
 
     getline(in, line);
     t->v1 = readVec3(line);
@@ -177,9 +159,7 @@ void Parser::parseTriangle() {
     getline(in, line);
     t->v3 = readVec3(line);
 
-    // while (getline(in, line) && !done) {
     parseProperties(t);
-    // }
 
     scene->addGeometry(t);
 }
@@ -199,13 +179,13 @@ void Parser::parseProperties(std::shared_ptr<Geometry> object) {
             parseFinish(object, line);
         }
         else if (line.find("translate") != string::npos) {
-            object->addTransform(TRANSFORM_TRANSLATE, readVec3(line));
+            object->translate(readVec3(line));
         }
         else if (line.find("rotate") != string::npos) {
-            object->addTransform(TRANSFORM_ROTATE, readVec3(line));
+            object->rotate(readVec3(line));
         }
         else if (line.find("scale") != string::npos) {
-            object->addTransform(TRANSFORM_SCALE, readVec3(line));
+            object->scale(readVec3(line));
         }
         else if (line.find("}") != string::npos) {
             done = true;
@@ -217,6 +197,8 @@ void Parser::parseProperties(std::shared_ptr<Geometry> object) {
             done = true;
         }
     }
+
+    object->finalizeTransform();
 }
 
 Eigen::Vector4f Parser::parsePigment(std::string line) {

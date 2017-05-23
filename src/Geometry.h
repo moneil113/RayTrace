@@ -2,13 +2,8 @@
 #define GEOMETRY_H
 
 #include <Eigen/Dense>
-#include <Eigen/StdVector>
 
 #include "Object.h"
-
-#define TRANSFORM_TRANSLATE 0
-#define TRANSFORM_ROTATE 1
-#define TRANSFORM_SCALE 2
 
 // "Optional" float. The value should only be considered when valid == true
 typedef struct {
@@ -36,23 +31,27 @@ protected:
     Eigen::Vector3f pigment;
     Finish_t finish;
 
-    std::vector<Eigen::Vector3f> transformValues;
-    std::vector<int> transformTypes;
+    Eigen::Matrix4f modelMatrix = Eigen::Matrix4f::Identity();
+
+    virtual floatOptional objectIntersect(const Ray &r) = 0;
 
 public:
-    Geometry() {}
 
     virtual std::string to_string();
     virtual std::string type() = 0;
 
-    void addTransform(int type, Eigen::Vector3f value);
     Eigen::Vector3f color() { return pigment; }
     const Finish_t &getFinish() { return finish; }
+
+    void scale(const Eigen::Vector3f);
+    void rotate(const Eigen::Vector3f);
+    void translate(const Eigen::Vector3f);
+    void finalizeTransform();
 
     // Tests for intersection. If there is no intersection, the floatOptional
     // will not be valid. If there is an intersection, the value of the
     // floatOptional will be the closest nonnegative t value of the input ray.
-    virtual floatOptional intersect(const Ray &r) = 0;
+    virtual floatOptional intersect(const Ray &r);
 
     // Given a point on the surface, return the normal
     // Assumes that the given point is on the surface of the object

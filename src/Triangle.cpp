@@ -43,7 +43,7 @@ void Triangle::computeDeterminants() {
     mat.col(1) = v1 - v3;
 }
 
-floatOptional Triangle::intersect(const Ray &r) {
+floatOptional Triangle::objectIntersect(const Ray &r) {
     float beta, gamma, t;
     // RHS of Ax = B matrix equation
     Vector3f rhs = v1 - r.origin();

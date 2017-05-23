@@ -11,7 +11,7 @@ private:
 
     void parseComment();
     // Parse objects
-    void parseCamera();
+    void parseCamera(std::string line);
     void parseLight_source(std::string line);
     void parseSphere(std::string line);
     void parsePlane(std::string line);

@@ -20,7 +20,7 @@ std::string Sphere::type() {
     return "Sphere";
 }
 
-floatOptional Sphere::intersect(const Ray &r) {
+floatOptional Sphere::objectIntersect(const Ray &r) {
     float A = r.direction().dot(r.direction());
     Eigen::Vector3f temp = (r.origin() - center);
     float B = 2 * temp.dot(r.direction());
@@ -48,5 +48,8 @@ floatOptional Sphere::intersect(const Ray &r) {
 }
 
 Eigen::Vector3f Sphere::normalAtPoint(Eigen::Vector3f p) {
-    return (p - center).normalized();
+    Eigen::Vector4f n;
+    n << (p - center).normalized(), 0;
+    n = modelMatrix.transpose() * n;
+    return n.head(3);
 }

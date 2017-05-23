@@ -15,7 +15,7 @@ public:
     std::string to_string();
     std::string type();
 
-    floatOptional intersect(const Ray &r);
+    floatOptional objectIntersect(const Ray &r);
     Eigen::Vector3f normalAtPoint(Eigen::Vector3f p);
 };
 #endif
