@@ -34,6 +34,7 @@ protected:
     Eigen::Matrix4f modelMatrix = Eigen::Matrix4f::Identity();
 
     virtual floatOptional objectIntersect(const Ray &r) = 0;
+    virtual Eigen::Vector3f objectNormal(const Eigen::Vector3f &p) = 0;
 
 public:
 
@@ -55,7 +56,9 @@ public:
 
     // Given a point on the surface, return the normal
     // Assumes that the given point is on the surface of the object
-    virtual Eigen::Vector3f normalAtPoint(Eigen::Vector3f p) = 0;
+    virtual Eigen::Vector3f normalAtPoint(const Eigen::Vector3f &p);
+
+    Ray getTransformedRay(const Ray &r);
 };
 
 #endif

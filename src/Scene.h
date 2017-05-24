@@ -36,7 +36,7 @@ public:
     void pixelTest(int x, int y);
     void firstHitTest(int x, int y);
     void pixelColorTest(int x, int y);
-    void pixelTraceTest(int x, int y);
+    void printRaysTest(int x, int y);
 };
 
 #endif

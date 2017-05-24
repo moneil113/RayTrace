@@ -66,15 +66,15 @@ int main(int argc, char const *argv[]) {
 
         sc->pixelColorTest(atoi(argv[5]), atoi(argv[6]));
     }
-    else if (strstr(argv[1], "pixeltrace")) {
+    else if (strstr(argv[1], "printrays")) {
         if (argc != 7 && argc != 8) {
-            std::cout << "usage: raytrace pixelcolor <input file> <width> <height> <x> <y> [-altbrdf]" << '\n';
+            std::cout << "usage: raytrace printrays <input file> <width> <height> <x> <y> [-altbrdf]" << '\n';
             exit(-1);
         }
         sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
         parseOptionalArgs(sc, argv, 7, argc);
 
-        sc->pixelTraceTest(atoi(argv[5]), atoi(argv[6]));
+        sc->printRaysTest(atoi(argv[5]), atoi(argv[6]));
     }
     else {
         std::cout << "usage: RayTrace <mode> <input file>" << '\n';

@@ -16,7 +16,7 @@ Ray Camera::rayToPixel(int x, int y) {
 
     Vector3f S = u_s * right + v_s * up + look_at;
 
-    return Ray(location, S);
+    return Ray(location, S.normalized());
 }
 
 Ray Camera::rayToSubPixel(int x, int y, int subX, int subY, int samples) {
@@ -27,7 +27,7 @@ Ray Camera::rayToSubPixel(int x, int y, int subX, int subY, int samples) {
 
     Vector3f S = u_s * right + v_s * up + look_at;
 
-    return Ray(location, S);
+    return Ray(location, S.normalized());
 }
 
 void Camera::setImageSize(int width, int height) {

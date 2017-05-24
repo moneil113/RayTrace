@@ -15,10 +15,17 @@ floatOptional Geometry::intersect(const Ray &r) {
 
     newOrigin = modelMatrix * newOrigin;
     newDir = modelMatrix * newDir;
-    const Ray transformedR = Ray(newOrigin.head(3),
-                                 newDir.head(3));
-    // std::cout << r.to_string() << " vs " << transformedR.to_string() << std::endl;
+    const Ray transformedR = Ray(newOrigin.head(3), newDir.head(3));
     return objectIntersect(transformedR);
+}
+
+Eigen::Vector3f Geometry::normalAtPoint(const Eigen::Vector3f &p) {
+    Vector4f localP, n;
+    localP << p, 1;
+    localP = modelMatrix * localP;
+    n << objectNormal(localP.head(3)), 0;
+    n = modelMatrix.transpose() * n;
+    return n.head(3).normalized();
 }
 
 std::string Geometry::to_string() {
@@ -52,8 +59,6 @@ void Geometry::rotate(const Eigen::Vector3f r) {
 }
 
 void Geometry::translate(const Eigen::Vector3f t) {
-    // Transform<float, 3, Projective> tr;
-    // tr = Translation3f(t);
     Matrix4f tr = Matrix4f::Identity();
     tr.col(3).head(3) = t;
     modelMatrix = tr * modelMatrix;
@@ -61,4 +66,16 @@ void Geometry::translate(const Eigen::Vector3f t) {
 
 void Geometry::finalizeTransform() {
     modelMatrix = modelMatrix.inverse().eval();
+}
+
+Ray Geometry::getTransformedRay(const Ray &r) {
+    Vector4f newOrigin;
+    newOrigin << r.origin(), 1;
+    Vector4f newDir;
+    newDir << r.direction(), 0;
+
+    newOrigin = modelMatrix * newOrigin;
+    newDir = modelMatrix * newDir;
+    return Ray(newOrigin.head(3), newDir.head(3));
+
 }

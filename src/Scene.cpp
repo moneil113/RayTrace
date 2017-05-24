@@ -132,6 +132,6 @@ void Scene::pixelColorTest(int x, int y) {
     }
 }
 
-void Scene::pixelTraceTest(int x, int y) {
-    renderer.pixelTraceTest(x, y);
+void Scene::printRaysTest(int x, int y) {
+    renderer.printRaysTest(x, y);
 }

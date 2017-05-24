@@ -47,9 +47,6 @@ floatOptional Sphere::objectIntersect(const Ray &r) {
     return ret;
 }
 
-Eigen::Vector3f Sphere::normalAtPoint(Eigen::Vector3f p) {
-    Eigen::Vector4f n;
-    n << (p - center).normalized(), 0;
-    n = modelMatrix.transpose() * n;
-    return n.head(3);
+Eigen::Vector3f Sphere::objectNormal(const Eigen::Vector3f &p) {
+    return (p - center).normalized();
 }

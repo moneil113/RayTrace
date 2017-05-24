@@ -54,7 +54,7 @@ private:
     Eigen::Vector3f reflect(const Ray &r, const Eigen::Vector3f &p,
         const std::shared_ptr<Geometry> object, int depth);
     Eigen::Vector3f refract(const Ray &r, const Eigen::Vector3f &p,
-        const std::shared_ptr<Geometry> object, int depth, bool enter);
+        const std::shared_ptr<Geometry> object, int depth);
 
     Eigen::Vector3f blinnPhongColor(const Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
     Eigen::Vector3f cookTorranceColor(const Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
@@ -82,7 +82,7 @@ public:
     void setSuperSamples(int n);
     void renderScene(std::string output);
     void pixelColorTest(int x, int y);
-    void pixelTraceTest(int x, int y);
+    void printRaysTest(int x, int y);
 
 };
 #endif

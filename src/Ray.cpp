@@ -4,7 +4,7 @@
 
 Ray::Ray(Eigen::Vector3f origin, Eigen::Vector3f direction) {
     _origin = origin;
-    _direction = direction.normalized();
+    _direction = direction;
 }
 
 Eigen::Vector3f Ray::getPoint(float t) const {
@@ -13,7 +13,7 @@ Eigen::Vector3f Ray::getPoint(float t) const {
 
 std::string formatVector(Eigen::Vector3f v) {
     std::stringstream str;
-    str << std::setprecision(4);
+    str << std::fixed << std::setprecision(4);
     str << v.x() << " " << v.y() << " " << v.z();
 
     return str.str();

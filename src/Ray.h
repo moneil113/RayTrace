@@ -15,6 +15,8 @@ public:
     const Eigen::Vector3f &direction() const { return _direction; }
     Eigen::Vector3f getPoint(float t) const;
 
+    bool refracted = false;
+
     std::string to_string() const;
 };
 

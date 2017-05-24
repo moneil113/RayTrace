@@ -33,6 +33,6 @@ public:
     std::string type();
 
     floatOptional objectIntersect(const Ray &r);
-    Eigen::Vector3f normalAtPoint(Eigen::Vector3f p);
+    Eigen::Vector3f objectNormal(const Eigen::Vector3f &p);
 };
 #endif
