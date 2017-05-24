@@ -51,6 +51,10 @@ void Scene::setSuperSamples(int n) {
     renderer.setSuperSamples(n);
 }
 
+void Scene::setFresnel() {
+    renderer.setFresnel();
+}
+
 void Scene::addLight(Light l) {
     lights.push_back(l);
 }

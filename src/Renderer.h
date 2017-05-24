@@ -42,6 +42,7 @@ private:
     const float epsilon = 0.001f;
     bool trace = false;
     int superSamples = 1;
+    bool doFresnel = false;
 
     Scene *scene;
 
@@ -53,7 +54,7 @@ private:
 
     Eigen::Vector3f reflect(const Ray &r, const Eigen::Vector3f &p,
         const std::shared_ptr<Geometry> object, int depth);
-    Eigen::Vector3f refract(const Ray &r, const Eigen::Vector3f &p,
+    Eigen::Vector3f refract(const Ray &r, const Eigen::Vector3f &p, float dist,
         const std::shared_ptr<Geometry> object, int depth);
 
     Eigen::Vector3f blinnPhongColor(const Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);
@@ -80,6 +81,8 @@ public:
     void setBRDF(int type);
     void setImageSize(int width, int height);
     void setSuperSamples(int n);
+    void setFresnel();
+
     void renderScene(std::string output);
     void pixelColorTest(int x, int y);
     void printRaysTest(int x, int y);

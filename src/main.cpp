@@ -13,7 +13,7 @@ void parseOptionalArgs(std::shared_ptr<Scene> sc, const char *argv[], int start,
             sc->setSuperSamples(n);
         }
         else if (strstr(argv[i], "-fresnel")) {
-            // set fresnel
+            sc->setFresnel();
         }
         else {
             std::cout << "Unknown optional argument: " << argv[i] << '\n';
@@ -57,17 +57,17 @@ int main(int argc, char const *argv[]) {
         sc->render("output.png");
     }
     else if (strstr(argv[1], "pixelcolor")) {
-        if (argc != 7 && argc != 8) {
+        if (argc < 7) {
             std::cout << "usage: raytrace pixelcolor <input file> <width> <height> <x> <y> [-altbrdf]" << '\n';
             exit(-1);
         }
         sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
-        parseOptionalArgs(sc, argv, 5, argc);
+        parseOptionalArgs(sc, argv, 7, argc);
 
         sc->pixelColorTest(atoi(argv[5]), atoi(argv[6]));
     }
     else if (strstr(argv[1], "printrays")) {
-        if (argc != 7 && argc != 8) {
+        if (argc < 7) {
             std::cout << "usage: raytrace printrays <input file> <width> <height> <x> <y> [-altbrdf]" << '\n';
             exit(-1);
         }

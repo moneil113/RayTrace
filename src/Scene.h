@@ -28,6 +28,8 @@ public:
     void setImageSize(int width, int height);
     void setBRDF(int type);
     void setSuperSamples(int n);
+    void setFresnel();
+
     void addLight(Light l);
     void addGeometry(std::shared_ptr<Geometry> g);
 
