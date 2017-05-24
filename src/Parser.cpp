@@ -62,7 +62,6 @@ std::shared_ptr<Scene> Parser::parse() {
 
 void Parser::parseCamera(std::string line) {
     Camera cam;
-    // string line;
     bool done = false;
 
     do {
@@ -87,7 +86,7 @@ void Parser::parseCamera(std::string line) {
         else {
             cerr << "bad property: " << line << "\n";
         }
-    } while (getline(in, line) && !done);
+    } while (!done && getline(in, line));
 
     scene->setCamera(cam);
 }
@@ -169,7 +168,7 @@ void Parser::parseProperties(std::shared_ptr<Geometry> object) {
     object->finish = {};
     string line;
 
-    while (getline(in, line) && !done) {
+    while (!done && getline(in, line)) {
         if (line.find("pigment") != string::npos) {
             Vector4f pigment = parsePigment(line);
             object->pigment = pigment.head<3>();
@@ -214,10 +213,14 @@ Eigen::Vector4f Parser::parsePigment(std::string line) {
 
 void Parser::parseFinish(std::shared_ptr<Geometry> object, std::string line) {
     int start = line.find("ambient");
-    object->finish.ambient = readFloat(line.substr(start));
+    if (start != string::npos) {
+        object->finish.ambient = readFloat(line.substr(start));
+    }
 
     start = line.find("diffuse");
-    object->finish.diffuse = readFloat(line.substr(start));
+    if (start != string::npos) {
+        object->finish.diffuse = readFloat(line.substr(start));
+    }
 
     start = line.find("specular");
     if (start != string::npos) {
