@@ -1,3 +1,4 @@
+#pragma once
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
@@ -26,15 +27,15 @@ private:
     // [a-b, a-c, d]
     float det1, det2, det3;
 
+    floatOptional objectIntersect(const Ray &r);
+    Eigen::Vector3f objectNormal(const Eigen::Vector3f &p);
+    void objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max);
+    Eigen::Vector3f objectCenter();
+
 public:
     Triangle ();
 
     std::string to_string();
     std::string type();
-
-    floatOptional objectIntersect(const Ray &r);
-    Eigen::Vector3f objectNormal(const Eigen::Vector3f &p);
-
-    void boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max);
 };
 #endif

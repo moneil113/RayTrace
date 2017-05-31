@@ -20,3 +20,7 @@ std::string Cone::to_string() {
 std::string Cone::type() {
     return "Cone";
 }
+
+Eigen::Vector3f Cone::objectCenter() {
+    return (base + cap) / 2;
+}

@@ -96,6 +96,10 @@ Eigen::Vector3f Triangle::objectNormal(const Eigen::Vector3f &p) {
     return normal;
 }
 
-void Triangle::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+void Triangle::objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
 
+}
+
+Eigen::Vector3f Triangle::objectCenter() {
+    return (v1 + v2 + v3) / 3;
 }

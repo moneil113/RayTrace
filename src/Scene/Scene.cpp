@@ -55,6 +55,11 @@ void Scene::setFresnel() {
     renderer.setFresnel();
 }
 
+void Scene::useSDS() {
+    rootNode = make_shared<BVHNode>();
+    rootNode->build(geometry);
+}
+
 void Scene::addLight(Light l) {
     lights.push_back(l);
 }
@@ -63,7 +68,7 @@ void Scene::addGeometry(std::shared_ptr<Geometry> g) {
     geometry.push_back(g);
 }
 
-std::shared_ptr<Geometry> Scene::firstHit(Ray r, floatOptional &t) {
+std::shared_ptr<Geometry> Scene::firstHitVector(const Ray &r, floatOptional &t) {
     t = {false, INFINITY};
     floatOptional temp;
     shared_ptr<Geometry> objectHit;
@@ -82,6 +87,19 @@ std::shared_ptr<Geometry> Scene::firstHit(Ray r, floatOptional &t) {
     }
     else {
         return NULL;
+    }
+}
+
+std::shared_ptr<Geometry> Scene::firstHitBVH(const Ray &r, floatOptional &t) {
+    return NULL;
+}
+
+std::shared_ptr<Geometry> Scene::firstHit(Ray r, floatOptional &t) {
+    if (rootNode) {
+        return firstHitBVH(r, t);
+    }
+    else {
+        return firstHitVector(r, t);
     }
 }
 

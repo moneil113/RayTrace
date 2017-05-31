@@ -1,3 +1,4 @@
+#pragma once
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
@@ -33,9 +34,13 @@ protected:
     Finish_t finish;
 
     Eigen::Matrix4f modelMatrix = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f inverseModelMatrix;
+    bool transformed = false;
 
     virtual floatOptional objectIntersect(const Ray &r) = 0;
     virtual Eigen::Vector3f objectNormal(const Eigen::Vector3f &p) = 0;
+    virtual void objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) = 0;
+    virtual Eigen::Vector3f objectCenter() = 0;
 
 public:
 
@@ -61,7 +66,8 @@ public:
 
     Ray getTransformedRay(const Ray &r);
 
-    virtual void boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) = 0;
+    void boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max);
+    Eigen::Vector3f getCenter();
 };
 
 #endif

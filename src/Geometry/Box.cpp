@@ -19,7 +19,11 @@ std::string Box::type() {
     return "Box";
 }
 
-void Box::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+void Box::objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
     min = corner1;
     max = corner2;
+}
+
+Eigen::Vector3f Box::objectCenter() {
+    return (corner1 + corner2) / 2;
 }

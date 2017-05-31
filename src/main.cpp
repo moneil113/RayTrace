@@ -16,7 +16,7 @@ void parseOptionalArgs(std::shared_ptr<Scene> sc, const char *argv[], int start,
             sc->setFresnel();
         }
         else if (strstr(argv[i], "-sds")) {
-            // use spacial data structure
+            sc->useSDS();
         }
         else {
             std::cout << "Unknown optional argument: " << argv[i] << '\n';

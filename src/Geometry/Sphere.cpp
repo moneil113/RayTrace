@@ -1,6 +1,7 @@
 #include <sstream>
 #include "Sphere.h"
-// #include "Ray.h"
+
+using namespace Eigen;
 
 Sphere::Sphere() {
 
@@ -22,7 +23,7 @@ std::string Sphere::type() {
 
 floatOptional Sphere::objectIntersect(const Ray &r) {
     float A = r.direction().dot(r.direction());
-    Eigen::Vector3f temp = (r.origin() - center);
+    Vector3f temp = (r.origin() - center);
     float B = 2 * temp.dot(r.direction());
     float C = temp.dot(temp) - radius * radius;
 
@@ -51,6 +52,11 @@ Eigen::Vector3f Sphere::objectNormal(const Eigen::Vector3f &p) {
     return (p - center).normalized();
 }
 
-void Sphere::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+void Sphere::objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+    min = center - Vector3f(radius, radius, radius);
+    max = center + Vector3f(radius, radius, radius);
+}
 
+Eigen::Vector3f Sphere::objectCenter() {
+    return center;
 }

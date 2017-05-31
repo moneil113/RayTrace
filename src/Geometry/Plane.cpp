@@ -1,7 +1,6 @@
 #include <sstream>
 #include <iostream>
 #include "Plane.h"
-// #include "Ray.h"
 
 using namespace Eigen;
 using namespace std;
@@ -42,6 +41,10 @@ Eigen::Vector3f Plane::objectNormal(const Eigen::Vector3f &p) {
     return normal;
 }
 
-void Plane::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
-    
+void Plane::objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+
+}
+
+Eigen::Vector3f Plane::objectCenter() {
+    return normal * distance;
 }

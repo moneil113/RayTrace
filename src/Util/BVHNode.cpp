@@ -1,23 +1,34 @@
+#include <algorithm>
 #include "BVHNode.h"
+
+
+#include <iostream>
 
 using namespace std;
 using namespace Eigen;
 
-BVHNode::BVHNode() {
-    left = NULL;
-    right = NULL;
-    min << INFINITY, INFINITY, INFINITY;
-    max << -INFINITY, -INFINITY, -INFINITY;
+BVHNode::BVHNode() :
+    left(NULL),
+    right(NULL),
+    object(NULL),
+    min(INFINITY, INFINITY, INFINITY),
+    max(-INFINITY, -INFINITY, -INFINITY)
+{
 }
 
-void BVHNode::recursiveBuild(shared_ptr<vector<shared_ptr<Geometry>>> objects,
-                             vector<shared_ptr<Geometry>>::iterator start,
-                             vector<shared_ptr<Geometry>>::iterator end,
+void BVHNode::recursiveBuild(const vector<shared_ptr<Geometry>> &objects,
+                             const vector<shared_ptr<Geometry>>::iterator start,
+                             const vector<shared_ptr<Geometry>>::iterator end,
                              int axis) {
-    if (std::distance(start, end) <= 1) {
-        calculateBoundingBox();
+    if (distance(start, end) <= 1) {
+        if (distance(start, end) == 1) {
+            object = objects.at(start - objects.begin());
+            object->boundingBox(min, max);
+        }
         return;
     }
+
+    sortOnAxis(start, end, axis);
 
     left = make_shared<BVHNode>();
     right = make_shared<BVHNode>();
@@ -26,7 +37,6 @@ void BVHNode::recursiveBuild(shared_ptr<vector<shared_ptr<Geometry>>> objects,
 
     left->recursiveBuild(objects, start, start + half, (axis + 1) % 3);
     right->recursiveBuild(objects, start + half, end, (axis + 1) % 3);
-
     calculateBoundingBox();
 }
 
@@ -50,19 +60,41 @@ void BVHNode::calculateBoundingBox() {
         rightMax << max;
     }
 
-    min << min(leftMin.x(), rightMin.x()),
-           min(leftMin.y(), rightMin.y()),
-           min(leftMin.z(), rightMin.z());
+    min << (leftMin.x() < rightMin.x() ? leftMin.x() : rightMin.x()),
+           (leftMin.y() < rightMin.y() ? leftMin.y() : rightMin.y()),
+           (leftMin.z() < rightMin.z() ? leftMin.z() : rightMin.z());
 
-    max << max(leftMax.x(), rightMax.x()),
-           max(leftMax.y(), rightMax.y()),
-           max(leftMax.z(), rightMax.z());
+    max << (leftMax.x() > rightMax.x() ? leftMax.x() : rightMax.x()),
+           (leftMax.y() > rightMax.y() ? leftMax.y() : rightMax.y()),
+           (leftMax.z() > rightMax.z() ? leftMax.z() : rightMax.z());
 }
 
-void BVHNode::sortOnAxis(int axis) {
-
+bool sortOnX(shared_ptr<Geometry> a, shared_ptr<Geometry> b) {
+    return a->getCenter().x() < b->getCenter().x();
 }
 
-void BVHNode::build(shared_ptr<vector<shared_ptr<Geometry>>> objects) {
-    recursiveBuild(objects, objects->begin(), objects->end(), 0);
+bool sortOnY(shared_ptr<Geometry> a, shared_ptr<Geometry> b) {
+    return a->getCenter().y() < b->getCenter().y();
+}
+
+bool sortOnZ(shared_ptr<Geometry> a, shared_ptr<Geometry> b) {
+    return a->getCenter().z() < b->getCenter().z();
+}
+
+void BVHNode::sortOnAxis(vector<shared_ptr<Geometry>>::iterator start,
+                         vector<shared_ptr<Geometry>>::iterator end,
+                         int axis) {
+    if (axis == 0) {
+        sort(start, end, sortOnX);
+    }
+    else if (axis == 1) {
+        sort(start, end, sortOnY);
+    }
+    else {
+        sort(start, end, sortOnZ);
+    }
+}
+
+void BVHNode::build(vector<shared_ptr<Geometry>> &objects) {
+    recursiveBuild(objects, objects.begin(), objects.end(), 0);
 }

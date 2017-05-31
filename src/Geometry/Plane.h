@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PLANE_H
 #define PLANE_H
 
@@ -18,7 +19,7 @@ public:
 
     floatOptional objectIntersect(const Ray &r);
     Eigen::Vector3f objectNormal(const Eigen::Vector3f &p);
-
-    void boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max);
+    void objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max);
+    Eigen::Vector3f objectCenter();
 };
 #endif
