@@ -6,7 +6,7 @@
 #include <iostream>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "../Util/stb_image_write.h"
 
 using namespace std;
 using namespace Eigen;
@@ -98,65 +98,69 @@ Vector3f Renderer::reflect(const Ray &r, const Vector3f &p, const shared_ptr<Geo
     return Vector3f(0, 0, 0);
 }
 
-Vector3f Renderer::refract(const Ray &r, const Vector3f &p, float dist, const shared_ptr<Geometry> object, int depth) {
-    Vector3f d = r.direction();
-    Vector3f n = object->normalAtPoint(p);
-    float ior = object->getFinish().ior;
-    float n1_n2 = 1 / ior;
+// Vector3f Renderer::refract(const Ray &r, const Vector3f &p, float dist, const shared_ptr<Geometry> object, int depth) {
+//     Vector3f d = r.direction();
+//     Vector3f n = object->normalAtPoint(p);
+//     float ior = object->getFinish().ior;
+//     float n1_n2 = 1 / ior;
+//
+//     // exiting object
+//     if (r.refracted) {
+//         n1_n2 = ior;
+//         n = -n;
+//     }
+//     float d_n = d.dot(n);
+//
+//     Vector3f t = (n1_n2) * (d - d_n * n);
+//     t -= n * sqrtf(1 - (n1_n2 * n1_n2) * (1 - d_n * d_n));
+//     t.normalize();
+//
+//     Ray refractRay = Ray(p + epsilon * t, t);
+//
+//     if (r.refracted) {
+//         // exiting the object
+//         floatOptional t;
+//         auto refractObject = scene->firstHit(refractRay, t);
+//         if (refractObject) {
+//             Vector3f rp = refractRay.getPoint(t.value);
+//             if (trace) {
+//                 printRayInfo(refractRay, object, 2, depth);
+//             }
+//             // Beer's law
+//             Vector3f otherColor = calculateColor(refractRay, rp, refractObject, depth + 1);
+//             Vector3f absorbance = (Vector3f(1, 1, 1) - object->color()) * 0.15 * -dist;
+//             // cout << "d = " << dist << endl;
+//             // cout << "absorbance: " << object->formatVector(absorbance) << endl;
+//             // Vector3f local = (this->*localColor)(r, object, p);
+//             Vector3f attnColor;
+//             attnColor = otherColor.cwiseProduct(Vector3f(exp(absorbance.x()),
+//                                                          exp(absorbance.y()),
+//                                                          exp(absorbance.z())));
+//             // cout << "otherColor: " << object->formatVector(otherColor) << endl;
+//             // cout << "attnColor: " << object->formatVector(attnColor) << endl;
+//             return attnColor;
+//         }
+//         else {
+//             if (trace) {
+//                 printRayInfo(refractRay, object, 2, depth);
+//             }
+//             return Vector3f(0, 0, 0);
+//         }
+//     }
+//     else {
+//         floatOptional t = object->intersect(refractRay);
+//         Vector3f rp = refractRay.getPoint(t.value);
+//         refractRay.refracted = true;
+//         if (trace) {
+//             printRayInfo(refractRay, object, 2, depth);
+//         }
+//         return refract(refractRay, rp, t.value, object, depth + 1);
+//         // return calculateColor(refractRay, rp, object, depth + 1);
+//     }
+// }
 
-    // exiting object
-    if (r.refracted) {
-        n1_n2 = ior;
-        n = -n;
-    }
-    float d_n = d.dot(n);
-
-    Vector3f t = (n1_n2) * (d - d_n * n);
-    t -= n * sqrtf(1 - (n1_n2 * n1_n2) * (1 - d_n * d_n));
-    t.normalize();
-
-    Ray refractRay = Ray(p + epsilon * t, t);
-
-    if (r.refracted) {
-        // exiting the object
-        floatOptional t;
-        auto refractObject = scene->firstHit(refractRay, t);
-        if (refractObject) {
-            Vector3f rp = refractRay.getPoint(t.value);
-            if (trace) {
-                printRayInfo(refractRay, object, 2, depth);
-            }
-            // Beer's law
-            Vector3f otherColor = calculateColor(refractRay, rp, refractObject, depth + 1);
-            Vector3f absorbance = (Vector3f(1, 1, 1) - object->color()) * 0.15 * -dist;
-            // cout << "d = " << dist << endl;
-            // cout << "absorbance: " << object->formatVector(absorbance) << endl;
-            // Vector3f local = (this->*localColor)(r, object, p);
-            Vector3f attnColor;
-            attnColor = otherColor.cwiseProduct(Vector3f(exp(absorbance.x()),
-                                                         exp(absorbance.y()),
-                                                         exp(absorbance.z())));
-            // cout << "otherColor: " << object->formatVector(otherColor) << endl;
-            // cout << "attnColor: " << object->formatVector(attnColor) << endl;
-            return attnColor;
-        }
-        else {
-            if (trace) {
-                printRayInfo(refractRay, object, 2, depth);
-            }
-            return Vector3f(0, 0, 0);
-        }
-    }
-    else {
-        floatOptional t = object->intersect(refractRay);
-        Vector3f rp = refractRay.getPoint(t.value);
-        refractRay.refracted = true;
-        if (trace) {
-            printRayInfo(refractRay, object, 2, depth);
-        }
-        return refract(refractRay, rp, t.value, object, depth + 1);
-        // return calculateColor(refractRay, rp, object, depth + 1);
-    }
+Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geometry> object, int depth) {
+    return Vector3f(0, 0, 0);
 }
 
 Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Geometry> object, int depth) {
@@ -173,31 +177,29 @@ Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Ge
             reflectColor << 0, 0, 0;
         }
 
-        Vector3f refractColor;
-        if (finish.filter > 0) {
-            floatOptional t;
-            t = object->intersect(r);
-            refractColor = refract(r, p, t.value, object, depth);
-        }
-        else {
-            refractColor << 0, 0, 0;
-        }
+        // Vector3f refractColor;
+        // if (finish.filter > 0) {
+        //     floatOptional t;
+        //     t = object->intersect(r);
+        //     refractColor = refract(r, p, t.value, object, depth);
+        // }
+        // else {
+        //     refractColor << 0, 0, 0;
+        // }
 
         Vector3f v = -r.direction();
         Vector3f n = object->normalAtPoint(p);
 
-        float localContribution = (1 - finish.filter) * (1 - finish.reflection);
-        float reflectContribution = (1 - finish.filter) * finish.reflection;
+        float localContribution = (1 - 0/*finish.filter*/) * (1 - finish.reflection);
+        float reflectContribution = (1 - 0/*finish.filter*/) * finish.reflection;
         if (doFresnel) {
-            float f = fresnel(finish.ior, v, n);
-            cout << "fresnel: " << f << endl;
             reflectContribution += finish.filter * fresnel(finish.ior, v, n);
         }
         float refractContribution = finish.filter * (1 - finish.reflection);
 
         if (trace) {
             cout << "      Reflection: " << object->formatVector(reflectColor) << endl;
-            cout << "      Refraction: " << object->formatVector(refractColor) << endl;
+            // cout << "      Refraction: " << object->formatVector(refractColor) << endl;
             cout << fixed << setprecision(4);
             cout << "   Contributions: " << localContribution << " Local, ";
             cout << reflectContribution << " Reflection, ";
@@ -205,8 +207,8 @@ Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Ge
         }
 
         return localContribution * local +
-            reflectContribution * reflectColor.cwiseProduct(object->color()) +
-            refractContribution * refractColor.cwiseProduct(object->color());
+            reflectContribution * reflectColor.cwiseProduct(object->color());// +
+            // refractContribution * refractColor;
     }
     else {
         return local;

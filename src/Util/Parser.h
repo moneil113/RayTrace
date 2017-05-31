@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 
-#include "Scene.h"
+#include "../Scene/Scene.h"
 
 class Parser {
 private:

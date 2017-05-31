@@ -1,7 +1,7 @@
 #include <sstream>
 #include <iostream>
 #include "Triangle.h"
-#include "Ray.h"
+// #include "Ray.h"
 
 using namespace Eigen;
 
@@ -94,4 +94,8 @@ Eigen::Vector3f Triangle::objectNormal(const Eigen::Vector3f &p) {
         normSet = true;
     }
     return normal;
+}
+
+void Triangle::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+
 }

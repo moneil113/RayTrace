@@ -19,5 +19,7 @@ public:
 
     floatOptional objectIntersect(const Ray &r) { return {false, 0.0f}; }
     Eigen::Vector3f objectNormal(const Eigen::Vector3f &p) { return Eigen::Vector3f(0, 0, 0); };
+
+    void boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) { return; }
 };
 #endif

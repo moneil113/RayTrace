@@ -1,6 +1,6 @@
 #include <sstream>
 #include "Sphere.h"
-#include "Ray.h"
+// #include "Ray.h"
 
 Sphere::Sphere() {
 
@@ -49,4 +49,8 @@ floatOptional Sphere::objectIntersect(const Ray &r) {
 
 Eigen::Vector3f Sphere::objectNormal(const Eigen::Vector3f &p) {
     return (p - center).normalized();
+}
+
+void Sphere::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+
 }

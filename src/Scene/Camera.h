@@ -1,7 +1,7 @@
 #ifndef CAMERA
 #define CAMERA
 
-#include "Object.h"
+#include "../Util/Object.h"
 
 class Ray;
 

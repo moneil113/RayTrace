@@ -18,3 +18,8 @@ std::string Box::to_string() {
 std::string Box::type() {
     return "Box";
 }
+
+void Box::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+    min = corner1;
+    max = corner2;
+}

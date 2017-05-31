@@ -1,7 +1,6 @@
 #include <sstream>
 #include <Eigen/Geometry>
 #include "Geometry.h"
-#include "Ray.h"
 
 #include <iostream>
 

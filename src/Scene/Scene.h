@@ -3,7 +3,7 @@
 
 #include "Camera.h"
 #include "Light.h"
-#include "Geometry.h"
+#include "../Geometry/Geometry.h"
 #include "Renderer.h"
 
 #include <vector>

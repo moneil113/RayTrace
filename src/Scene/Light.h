@@ -1,7 +1,7 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include "Object.h"
+#include "../Util/Object.h"
 #include <Eigen/Dense>
 
 class Light : public Object{

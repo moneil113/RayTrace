@@ -54,7 +54,7 @@ private:
 
     Eigen::Vector3f reflect(const Ray &r, const Eigen::Vector3f &p,
         const std::shared_ptr<Geometry> object, int depth);
-    Eigen::Vector3f refract(const Ray &r, const Eigen::Vector3f &p, float dist,
+    Eigen::Vector3f refract(const Ray &r, const Eigen::Vector3f &p,
         const std::shared_ptr<Geometry> object, int depth);
 
     Eigen::Vector3f blinnPhongColor(const Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p);

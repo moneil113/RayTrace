@@ -1,7 +1,7 @@
 #include <sstream>
 #include <iostream>
 #include "Plane.h"
-#include "Ray.h"
+// #include "Ray.h"
 
 using namespace Eigen;
 using namespace std;
@@ -40,4 +40,8 @@ floatOptional Plane::objectIntersect(const Ray &r) {
 
 Eigen::Vector3f Plane::objectNormal(const Eigen::Vector3f &p) {
     return normal;
+}
+
+void Plane::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+    
 }

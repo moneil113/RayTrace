@@ -1,6 +1,6 @@
 #include <iostream>
 #include <memory>
-#include "Parser.h"
+#include "Util/Parser.h"
 
 void parseOptionalArgs(std::shared_ptr<Scene> sc, const char *argv[], int start, int len) {
     for (int i = start; i < len; i++) {
@@ -14,6 +14,9 @@ void parseOptionalArgs(std::shared_ptr<Scene> sc, const char *argv[], int start,
         }
         else if (strstr(argv[i], "-fresnel")) {
             sc->setFresnel();
+        }
+        else if (strstr(argv[i], "-sds")) {
+            // use spacial data structure
         }
         else {
             std::cout << "Unknown optional argument: " << argv[i] << '\n';

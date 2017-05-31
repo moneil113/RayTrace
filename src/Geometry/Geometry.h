@@ -3,7 +3,8 @@
 
 #include <Eigen/Dense>
 
-#include "Object.h"
+#include "../Util/Object.h"
+#include "../Scene/Ray.h"
 
 // "Optional" float. The value should only be considered when valid == true
 typedef struct {
@@ -59,6 +60,8 @@ public:
     virtual Eigen::Vector3f normalAtPoint(const Eigen::Vector3f &p);
 
     Ray getTransformedRay(const Ray &r);
+
+    virtual void boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) = 0;
 };
 
 #endif

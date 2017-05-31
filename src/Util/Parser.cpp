@@ -4,12 +4,12 @@
 #include <memory>
 
 #include "Parser.h"
-#include "Scene.h"
-#include "Sphere.h"
-#include "Plane.h"
-#include "Box.h"
-#include "Cone.h"
-#include "Triangle.h"
+#include "../Scene/Scene.h"
+#include "../Geometry/Sphere.h"
+#include "../Geometry/Plane.h"
+#include "../Geometry/Box.h"
+#include "../Geometry/Cone.h"
+#include "../Geometry/Triangle.h"
 
 using namespace std;
 using namespace Eigen;
