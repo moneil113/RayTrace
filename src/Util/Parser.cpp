@@ -86,6 +86,9 @@ void Parser::parseCamera(std::string line) {
         else {
             cerr << "bad property: " << line << "\n";
         }
+        if (line.find("}") != string::npos) {
+            done = true;
+        }
     } while (!done && getline(in, line));
 
     scene->setCamera(cam);
