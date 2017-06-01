@@ -10,8 +10,8 @@ Box::Box() {
 std::string Box::to_string() {
     std::stringstream str;
     str << "box:\n";
-    str << "      corner1  = " << formatVector(corner1) << "\n";
-    str << "      corner2  = " << formatVector(corner2) << "\n";
+    str << "      min  = " << formatVector(min) << "\n";
+    str << "      max  = " << formatVector(max) << "\n";
     str << Geometry::to_string();
 
     return str.str();
@@ -39,8 +39,8 @@ floatOptional Box::objectIntersect(const Ray &r) {
 
     Vector3f origin = r.origin();
 
-    float t1 = (corner1.x() - origin.x()) / dx;
-    float t2 = (corner2.x() - origin.x()) / dx;
+    float t1 = (min.x() - origin.x()) / dx;
+    float t2 = (max.x() - origin.x()) / dx;
 
     if (t1 > t2) {
         swap(t1, t2);
@@ -52,8 +52,8 @@ floatOptional Box::objectIntersect(const Ray &r) {
         tgmax = t2;
     }
 
-    t1 = (corner1.y() - origin.y()) / dy;
-    t2 = (corner2.y() - origin.y()) / dy;
+    t1 = (min.y() - origin.y()) / dy;
+    t2 = (max.y() - origin.y()) / dy;
     if (t1 > t2) {
         swap(t1, t2);
     }
@@ -64,8 +64,8 @@ floatOptional Box::objectIntersect(const Ray &r) {
         tgmax = t2;
     }
 
-    t1 = (corner1.z() - origin.z()) / dz;
-    t2 = (corner2.z() - origin.z()) / dz;
+    t1 = (min.z() - origin.z()) / dz;
+    t2 = (max.z() - origin.z()) / dz;
     if (t1 > t2) {
         swap(t1, t2);
     }
@@ -89,61 +89,31 @@ bool floatEqual(float a, float b) {
 }
 
 Eigen::Vector3f Box::objectNormal(const Eigen::Vector3f &p) {
-    if (floatEqual(p.x(), corner1.x())) {
-        if (corner1.x() < corner2.x()) {
-            return Vector3f(-1, 0, 0);
-        }
-        else {
-            return Vector3f(1, 0, 0);
-        }
+    if (floatEqual(p.x(), min.x())) {
+        return Vector3f(-1, 0, 0);
     }
-    else if (floatEqual(p.x(), corner2.x())) {
-        if (corner1.x() < corner2.x()) {
-            return Vector3f(1, 0, 0);
-        }
-        else {
-            return Vector3f(-1, 0, 0);
-        }
+    else if (floatEqual(p.x(), max.x())) {
+        return Vector3f(1, 0, 0);
     }
-    else if (floatEqual(p.y(), corner1.y())) {
-        if (corner1.y() < corner2.y()) {
-            return Vector3f(0, -1, 0);
-        }
-        else {
-            return Vector3f(0, 1, 0);
-        }
+    else if (floatEqual(p.y(), min.y())) {
+        return Vector3f(0, -1, 0);
     }
-    else if (floatEqual(p.y(), corner2.y())) {
-        if (corner1.y() < corner2.y()) {
-            return Vector3f(0, 1, 0);
-        }
-        else {
-            return Vector3f(0, -1, 0);
-        }
+    else if (floatEqual(p.y(), max.y())) {
+        return Vector3f(0, 1, 0);
     }
-    else if (floatEqual(p.z(), corner1.z())) {
-        if (corner1.z() < corner2.z()) {
-            return Vector3f(0, 0, -1);
-        }
-        else {
-            return Vector3f(0, 0, 1);
-        }
+    else if (floatEqual(p.z(), min.z())) {
+        return Vector3f(0, 0, -1);
     }
     else {
-        if (corner1.z() < corner2.z()) {
-            return Vector3f(0, 0, 1);
-        }
-        else {
-            return Vector3f(0, 0, -1);
-        }
+        return Vector3f(0, 0, 1);
     }
 }
 
 void Box::objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
-    min = corner1;
-    max = corner2;
+    min = this->min;
+    max = this->max;
 }
 
 Eigen::Vector3f Box::objectCenter() {
-    return (corner1 + corner2) / 2;
+    return (min + max) / 2;
 }

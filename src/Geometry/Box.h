@@ -8,8 +8,8 @@
 class Box : public Geometry {
 friend class Parser;
 private:
-    Eigen::Vector3f corner1;
-    Eigen::Vector3f corner2;
+    Eigen::Vector3f min;
+    Eigen::Vector3f max;
 
     floatOptional objectIntersect(const Ray &r);
     Eigen::Vector3f objectNormal(const Eigen::Vector3f &p);

@@ -127,9 +127,9 @@ void Parser::parsePlane(std::string l) {
 
 void Parser::parseBox(std::string l) {
     shared_ptr<Box> b = make_shared<Box>();
-    b->corner1 = readVec3(l);
+    b->min = readVec3(l);
     int start = l.find(">");
-    b->corner2 = readVec3(l.substr(start));
+    b->max = readVec3(l.substr(start));
 
     parseProperties(b);
 
