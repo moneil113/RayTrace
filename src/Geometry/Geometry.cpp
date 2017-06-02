@@ -37,24 +37,51 @@ Eigen::Vector3f Geometry::normalAtPoint(const Eigen::Vector3f &p) {
     }
 }
 
+Eigen::Vector3f Geometry::minVector(const Eigen::Vector3f &a, const Eigen::Vector3f &b) {
+    Vector3f minVec;
+    minVec.x() = std::min(a.x(), b.x());
+    minVec.y() = std::min(a.y(), b.y());
+    minVec.z() = std::min(a.z(), b.z());
+    return minVec;
+}
+
+Eigen::Vector3f Geometry::maxVector(const Eigen::Vector3f &a, const Eigen::Vector3f &b) {
+    Vector3f maxVec;
+    maxVec.x() = std::max(a.x(), b.x());
+    maxVec.y() = std::max(a.y(), b.y());
+    maxVec.z() = std::max(a.z(), b.z());
+    return maxVec;
+}
+
+void Geometry::worldSpaceBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+    // clockwise on bottom, then top
+    Vector4f v[8];
+    // bottom vertices
+    v[0] << min, 1;
+    v[1] << max.x(), min.y(), min.z(), 1;
+    v[2] << max.x(), min.y(), max.z(), 1;
+    v[3] << min.x(), min.y(), max.z(), 1;
+    // top vertices
+    v[4] << min.x(), max.y(), min.z(), 1;
+    v[5] << max.x(), max.y(), min.z(), 1;
+    v[6] << max, 1;
+    v[7] << min.x(), max.y(), max.z(), 1;
+
+    min << INFINITY, INFINITY, INFINITY;
+    max << -INFINITY, -INFINITY, -INFINITY;
+    for (int i = 0; i < 8; i++) {
+        v[i] = modelMatrix * v[i];
+        min = minVector(min, v[i].head(3));
+        max = maxVector(max, v[i].head(3));
+    }
+
+
+}
+
 void Geometry::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
     objectBoundingBox(min, max);
     if (transformed) {
-        Vector4f min4, max4;
-        min4 << min, 1;
-        max4 << max, 1;
-        min4 = modelMatrix * min4;
-        max4 = modelMatrix * max4;
-
-        // We have bounding coordinates of object in world space,
-        // find bounding box of box these describe
-        min << (min4.x() < max4.x() ? min4.x() : max4.x()),
-               (min4.y() < max4.y() ? min4.y() : max4.y()),
-               (min4.z() < max4.z() ? min4.z() : max4.z());
-
-        max << (min4.x() > max4.x() ? min4.x() : max4.x()),
-               (min4.y() > max4.y() ? min4.y() : max4.y()),
-               (min4.z() > max4.z() ? min4.z() : max4.z());
+        worldSpaceBoundingBox(min, max);
     }
 }
 

@@ -29,6 +29,11 @@ class Ray;
 class Geometry : public Object {
 friend class Parser;
 
+private:
+    Eigen::Vector3f minVector(const Eigen::Vector3f &min, const Eigen::Vector3f &max);
+    Eigen::Vector3f maxVector(const Eigen::Vector3f &min, const Eigen::Vector3f &max);
+    void worldSpaceBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max);
+
 protected:
     Eigen::Vector3f pigment;
     Finish_t finish;
