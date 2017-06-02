@@ -181,7 +181,7 @@ std::shared_ptr<Geometry> BVHNode::firstHit(const Ray &r, floatOptional &t) {
     // this is a leaf node, check if ray hits object
     else {
         t = object->intersect(r);
-        if (t.valid) {
+        if (t.valid && t.value > 0.001f) {
             hitObj = object;
         }
     }

@@ -74,8 +74,6 @@ void Geometry::worldSpaceBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max)
         min = minVector(min, v[i].head(3));
         max = maxVector(max, v[i].head(3));
     }
-
-
 }
 
 void Geometry::boundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {

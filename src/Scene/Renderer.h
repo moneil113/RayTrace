@@ -55,6 +55,8 @@ private:
 
     Eigen::Vector3f beersLawColor(const Eigen::Vector3f &refractColor,
         const Eigen::Vector3f &objectColor, float distance);
+    float schlicksApproximation(const float ior, const Eigen::Vector3f &n,
+        const Eigen::Vector3f &v);
 
     Eigen::Vector3f reflect(const Ray &r, const Eigen::Vector3f &p,
         const std::shared_ptr<Geometry> object, int depth);

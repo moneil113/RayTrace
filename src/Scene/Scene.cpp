@@ -76,7 +76,7 @@ std::shared_ptr<Geometry> Scene::firstHitVector(const Ray &r, floatOptional &t) 
     for (int i = 0; i < geometry.size(); i++) {
         temp = geometry[i]->intersect(r);
 
-        if (temp.valid && temp.value > EPSILON && temp.value < t.value) {
+        if (temp.valid && temp.value > 0.001f && temp.value < t.value) {
             t = temp;
             objectHit = geometry[i];
         }

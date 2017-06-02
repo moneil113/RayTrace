@@ -155,8 +155,8 @@ Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geo
     }
 }
 
-float schlicks(float ior, const Vector3f &n, const Vector3f &v) {
-    float f0 = powf(ior - 1, 2) / powf(ior + 1, 2);
+float Renderer::schlicksApproximation(const float ior, const Vector3f &n, const Vector3f &v) {
+    float f0 = powf((ior - 1) / (ior + 1), 2);
     return f0 + (1 - f0) * powf(1 - n.dot(v), 5);
 }
 
@@ -168,16 +168,15 @@ Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Ge
 
         float fresnelReflectance = 0;
 
-        if (doFresnel && finish.filter > 0) {
+        if (doFresnel && finish.filter > 0 && !r.refracted) {
             Vector3f n = object->normalAtPoint(p);
             Vector3f v = -r.direction();
-            fresnelReflectance = schlicks(finish.ior, n, v);
+            fresnelReflectance = schlicksApproximation(finish.ior, n, v);
         }
 
         Vector3f reflectColor;
-        if (finish.reflection > 0) {
+        if ((finish.reflection > 0 || fresnelReflectance > 0) && !r.refracted) {
             reflectColor = reflect(r, p, object, depth);
-            // cout << "reflect\n";
         }
         else {
             reflectColor << 0, 0, 0;
@@ -229,6 +228,7 @@ Eigen::Vector3f Renderer::blinnPhongColor(const Ray &r, std::shared_ptr<Geometry
 
     Vector3f n = object->normalAtPoint(p);
     // if we are look at the back of a plane/triangle, we want the opposite of the normal
+    // or if we are inside of an object
     if (n.dot(r.direction()) > 0) {
         n = -n;
     }
