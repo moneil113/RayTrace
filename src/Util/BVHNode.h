@@ -17,6 +17,9 @@ private:
     Eigen::Vector3f min;
     Eigen::Vector3f max;
 
+    Eigen::Vector3f minVector(const Eigen::Vector3f &a, const Eigen::Vector3f &b);
+    Eigen::Vector3f maxVector(const Eigen::Vector3f &a, const Eigen::Vector3f &b);
+
     void recursiveBuild(const std::vector<std::shared_ptr<Geometry>> &objects,
                         const std::vector<std::shared_ptr<Geometry>>::iterator start,
                         const std::vector<std::shared_ptr<Geometry>>::iterator end,

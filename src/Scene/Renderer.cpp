@@ -64,7 +64,7 @@ bool Renderer::inShadow(const Eigen::Vector3f &point, const Light &light) {
 
     Vector3f l = (light.getLocation() - point).normalized();
     floatOptional t;
-    Ray lightRay = Ray(point, l);
+    Ray lightRay = Ray(point + epsilon * l, l);
     hit = scene->firstHit(lightRay, t);
 
     //Check if we hit something behind the light
@@ -155,15 +155,29 @@ Vector3f Renderer::refract(const Ray &r, const Vector3f &p, const shared_ptr<Geo
     }
 }
 
+float schlicks(float ior, const Vector3f &n, const Vector3f &v) {
+    float f0 = powf(ior - 1, 2) / powf(ior + 1, 2);
+    return f0 + (1 - f0) * powf(1 - n.dot(v), 5);
+}
+
 Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Geometry> object, int depth) {
     Vector3f local = (this->*localColor)(r, object, p);
 
     if (depth <= maxBounces) {
         Finish_t finish = object->getFinish();
 
+        float fresnelReflectance = 0;
+
+        if (doFresnel && finish.filter > 0) {
+            Vector3f n = object->normalAtPoint(p);
+            Vector3f v = -r.direction();
+            fresnelReflectance = schlicks(finish.ior, n, v);
+        }
+
         Vector3f reflectColor;
-        if (finish.reflection > 0 && !r.refracted) {
+        if (finish.reflection > 0) {
             reflectColor = reflect(r, p, object, depth);
+            // cout << "reflect\n";
         }
         else {
             reflectColor << 0, 0, 0;
@@ -179,15 +193,10 @@ Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Ge
             refractColor << 0, 0, 0;
         }
 
-        Vector3f v = -r.direction();
-        Vector3f n = object->normalAtPoint(p);
-
         float localContribution = (1 - finish.filter) * (1 - finish.reflection);
-        float reflectContribution = (1 - finish.filter) * finish.reflection;
-        if (doFresnel) {
-            reflectContribution += finish.filter * fresnel(finish.ior, v, n);
-        }
-        float refractContribution = finish.filter * (1 - finish.reflection);
+        float reflectContribution = (1 - finish.filter) * finish.reflection
+            + finish.filter * fresnelReflectance;
+        float refractContribution = finish.filter * (1 - fresnelReflectance);
 
         if (trace) {
             cout << "      Reflection: " << object->formatVector(reflectColor) << endl;
@@ -229,8 +238,7 @@ Eigen::Vector3f Renderer::blinnPhongColor(const Ray &r, std::shared_ptr<Geometry
         auto light = scene->lights.at(i);
         Vector3f l = (light.getLocation() - p).normalized();
 
-        // don't want self shadows on refracted light
-        if (r.refracted || !inShadow(p, light)) {
+        if (!inShadow(p, light)) {
             Vector3f h = (v + l).normalized();
             Vector3f lc = light.getColor();
             Vector3f diff = blinnPhongDiffuse(n, l, kd, lc);
@@ -282,8 +290,7 @@ Eigen::Vector3f Renderer::cookTorranceColor(const Ray &r, std::shared_ptr<Geomet
         auto light = scene->lights.at(i);
         Vector3f l = (light.getLocation() - p).normalized();
 
-        // don't want self shadows on refracted light
-        if (r.refracted || !inShadow(p, light)) {
+        if (!inShadow(p, light)) {
             Vector3f h = (v + l).normalized();
             Vector3f lc = light.getColor();
             Vector3f rd = kd * fmaxf(0, n.dot(l));

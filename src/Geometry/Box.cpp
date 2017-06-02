@@ -84,7 +84,7 @@ floatOptional Box::objectIntersect(const Ray &r) {
         return {true, tgmin};
     }
     else {
-        return {true, tgmin};
+        return {true, tgmax};
     }
 }
 

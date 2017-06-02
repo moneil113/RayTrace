@@ -244,6 +244,9 @@ void Parser::parseFinish(std::shared_ptr<Geometry> object, std::string line) {
     if (start != string::npos) {
         object->finish.ior = readFloat(line.substr(start));
     }
+    else {
+        object->finish.ior = 1;
+    }
 
     start = line.find("reflection");
     if (start != string::npos) {

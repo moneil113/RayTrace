@@ -38,33 +38,38 @@ void BVHNode::recursiveBuild(const vector<shared_ptr<Geometry>> &objects,
     calculateBoundingBox();
 }
 
+Eigen::Vector3f BVHNode::minVector(const Eigen::Vector3f &a, const Eigen::Vector3f &b) {
+    Vector3f minVec;
+    minVec.x() = std::min(a.x(), b.x());
+    minVec.y() = std::min(a.y(), b.y());
+    minVec.z() = std::min(a.z(), b.z());
+    return minVec;
+}
+
+Eigen::Vector3f BVHNode::maxVector(const Eigen::Vector3f &a, const Eigen::Vector3f &b) {
+    Vector3f maxVec;
+    maxVec.x() = std::max(a.x(), b.x());
+    maxVec.y() = std::max(a.y(), b.y());
+    maxVec.z() = std::max(a.z(), b.z());
+    return maxVec;
+}
+
 void BVHNode::calculateBoundingBox() {
-    Vector3f leftMin, leftMax, rightMin, rightMax;
     if (left != NULL) {
-        leftMin = left->getMin();
-        leftMax = left->getMax();
-    }
-    else {
-        leftMin << min;
-        leftMax << max;
+        Vector3f leftMin = left->getMin();
+        Vector3f leftMax = left->getMax();
+
+        min = minVector(min, leftMin);
+        max = maxVector(max, leftMax);
     }
 
     if (right != NULL) {
-        rightMin = right->getMin();
-        rightMax = right->getMax();
-    }
-    else {
-        rightMin << min;
-        rightMax << max;
-    }
+        Vector3f rightMin = right->getMin();
+        Vector3f rightMax = right->getMax();
 
-    min << (leftMin.x() < rightMin.x() ? leftMin.x() : rightMin.x()),
-           (leftMin.y() < rightMin.y() ? leftMin.y() : rightMin.y()),
-           (leftMin.z() < rightMin.z() ? leftMin.z() : rightMin.z());
-
-    max << (leftMax.x() > rightMax.x() ? leftMax.x() : rightMax.x()),
-           (leftMax.y() > rightMax.y() ? leftMax.y() : rightMax.y()),
-           (leftMax.z() > rightMax.z() ? leftMax.z() : rightMax.z());
+        min = minVector(min, rightMin);
+        max = maxVector(max, rightMax);
+    }
 }
 
 bool sortOnX(shared_ptr<Geometry> a, shared_ptr<Geometry> b) {
@@ -150,12 +155,7 @@ bool BVHNode::hitsNode(const Ray &r) {
         return false;
     }
 
-    if (tgmin > 0) {
-        return true;
-    }
-    else {
-        return true;
-    }
+    return true;
 }
 
 std::shared_ptr<Geometry> BVHNode::firstHit(const Ray &r, floatOptional &t) {
