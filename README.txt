@@ -1,4 +1,3 @@
-As of Program 4 the following issues exist:
+As of Program 5 the following issues exist:
 
-• Issues with refractions (still tracking problem)
 • No Schlick's approximation

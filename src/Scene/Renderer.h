@@ -53,6 +53,9 @@ private:
     Eigen::Vector3f calculateColor(const Ray &r, const Eigen::Vector3f &p,
         std::shared_ptr<Geometry> object, int depth);
 
+    Eigen::Vector3f beersLawColor(const Eigen::Vector3f &refractColor,
+        const Eigen::Vector3f &objectColor, float distance);
+
     Eigen::Vector3f reflect(const Ray &r, const Eigen::Vector3f &p,
         const std::shared_ptr<Geometry> object, int depth);
     Eigen::Vector3f refract(const Ray &r, const Eigen::Vector3f &p,

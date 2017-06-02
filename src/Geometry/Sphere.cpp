@@ -18,6 +18,12 @@ std::string Sphere::to_string() {
 }
 
 std::string Sphere::type() {
+    if (finish.filter < 1) {
+        return "refract sphere";
+    }
+    else {
+        return "solid sphere";
+    }
     return "Sphere";
 }
 

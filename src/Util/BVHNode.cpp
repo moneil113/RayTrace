@@ -1,8 +1,6 @@
 #include <algorithm>
-#include "BVHNode.h"
-
-
 #include <iostream>
+#include "BVHNode.h"
 
 using namespace std;
 using namespace Eigen;
