@@ -91,7 +91,8 @@ std::shared_ptr<Geometry> Scene::firstHitVector(const Ray &r, floatOptional &t) 
 }
 
 std::shared_ptr<Geometry> Scene::firstHitBVH(const Ray &r, floatOptional &t) {
-    return NULL;
+    auto hit = rootNode->firstHit(r, t);
+    return hit;//rootNode->firstHit(r, t);
 }
 
 std::shared_ptr<Geometry> Scene::firstHit(Ray r, floatOptional &t) {

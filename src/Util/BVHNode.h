@@ -26,6 +26,10 @@ private:
                     std::vector<std::shared_ptr<Geometry>>::iterator end,
                     int axis);
 
+    bool hitsNode(const Ray &r);
+
+    void print(int depth);
+
 public:
     BVHNode();
 
@@ -34,5 +38,7 @@ public:
     const std::shared_ptr<BVHNode> &getRight() const { return right; }
     const Eigen::Vector3f &getMin() const { return min; }
     const Eigen::Vector3f &getMax() const { return max; }
+
+    std::shared_ptr<Geometry> firstHit(const Ray &r, floatOptional &t);
 };
 #endif

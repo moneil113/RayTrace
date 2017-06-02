@@ -80,7 +80,12 @@ floatOptional Box::objectIntersect(const Ray &r) {
         return {false, 0.0f};
     }
 
-    return {true, tgmin};
+    if (tgmin > 0) {
+        return {true, tgmin};
+    }
+    else {
+        return {true, tgmin};
+    }
 }
 
 bool floatEqual(float a, float b) {

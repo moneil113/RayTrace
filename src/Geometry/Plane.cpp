@@ -42,7 +42,17 @@ Eigen::Vector3f Plane::objectNormal(const Eigen::Vector3f &p) {
 }
 
 void Plane::objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
-
+    min << -INFINITY, -INFINITY, -INFINITY;
+    max << INFINITY, INFINITY, INFINITY;
+    if (normal.x() == 0 && normal.y() == 0) {
+        min.z() = max.z() = distance;
+    }
+    else if (normal.x() == 0 && normal.z() == 0) {
+        min.y() = max.y() = distance;
+    }
+    else if (normal.y() == 0 && normal.z() == 0) {
+        min.x() = max.x() = distance;
+    }
 }
 
 Eigen::Vector3f Plane::objectCenter() {

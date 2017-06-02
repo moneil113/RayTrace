@@ -227,6 +227,10 @@ Eigen::Vector3f Renderer::blinnPhongColor(const Ray &r, std::shared_ptr<Geometry
     Vector3f color = ka;
 
     Vector3f n = object->normalAtPoint(p);
+    // if we are look at the back of a plane/triangle, we want the opposite of the normal
+    if (n.dot(r.direction()) > 0) {
+        n = -n;
+    }
     Vector3f v = -r.direction().normalized();
 
     for (int i = 0; i < scene->lights.size(); i++) {

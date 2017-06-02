@@ -97,7 +97,13 @@ Eigen::Vector3f Triangle::objectNormal(const Eigen::Vector3f &p) {
 }
 
 void Triangle::objectBoundingBox(Eigen::Vector3f &min, Eigen::Vector3f &max) {
+    min.x() = std::min(v1.x(), std::min(v2.x(), v3.x()));
+    min.y() = std::min(v1.y(), std::min(v2.y(), v3.y()));
+    min.z() = std::min(v1.z(), std::min(v2.z(), v3.z()));
 
+    max.x() = std::max(v1.x(), std::max(v2.x(), v3.x()));
+    max.y() = std::max(v1.y(), std::max(v2.y(), v3.y()));
+    max.z() = std::max(v1.z(), std::max(v2.z(), v3.z()));
 }
 
 Eigen::Vector3f Triangle::objectCenter() {
