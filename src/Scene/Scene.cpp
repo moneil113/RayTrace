@@ -60,6 +60,10 @@ void Scene::useSDS() {
     rootNode->build(geometry);
 }
 
+void Scene::useGlobalIllumination() {
+    renderer.useGlobalIllumination();
+}
+
 void Scene::addLight(Light l) {
     lights.push_back(l);
 }

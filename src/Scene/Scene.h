@@ -36,6 +36,7 @@ public:
     void setSuperSamples(int n);
     void setFresnel();
     void useSDS();
+    void useGlobalIllumination();
 
     void addLight(Light l);
     void addGeometry(std::shared_ptr<Geometry> g);

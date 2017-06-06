@@ -50,7 +50,7 @@ std::shared_ptr<Scene> Parser::parse() {
             parseCone(line);
         }
         else if (line.find("triangle") != string::npos) {
-            parseTriangle();
+            parseTriangle(line);
         }
         else {
             cout << "not supported: " << line << '\n';
@@ -150,16 +150,32 @@ void Parser::parseCone(std::string l) {
     scene->addGeometry(c);
 }
 
-void Parser::parseTriangle() {
+void Parser::parseTriangle(std::string l) {
     shared_ptr<Triangle> t = make_shared<Triangle>();
-    string line;
+    int start = l.find("<");
 
-    getline(in, line);
-    t->v1 = readVec3(line);
-    getline(in, line);
-    t->v2 = readVec3(line);
-    getline(in, line);
-    t->v3 = readVec3(line);
+    if (start == string::npos) {
+        getline(in, l);
+        start = l.find("<");
+    }
+    l = l.substr(start);
+    t->v1 = readVec3(l);
+
+    start = l.find("<", 1);
+    if (start == string::npos) {
+        getline(in, l);
+        start = l.find("<");
+    }
+    l = l.substr(start);
+    t->v2 = readVec3(l);
+
+    start = l.find("<", 1);
+    if (start == string::npos) {
+        getline(in, l);
+        start = l.find("<");
+    }
+    l = l.substr(start);
+    t->v3 = readVec3(l);
 
     parseProperties(t);
 

@@ -17,7 +17,7 @@ private:
     void parsePlane(std::string line);
     void parseBox(std::string line);
     void parseCone(std::string line);
-    void parseTriangle();
+    void parseTriangle(std::string line);
     // Convenience functions
     void parseProperties(std::shared_ptr<Geometry> object);
     Eigen::Vector4f parsePigment(std::string line);

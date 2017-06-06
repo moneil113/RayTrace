@@ -59,6 +59,10 @@ void Renderer::setFresnel() {
     doFresnel = true;
 }
 
+void Renderer::useGlobalIllumination() {
+    globalIlluminationOn = true;
+}
+
 bool Renderer::inShadow(const Eigen::Vector3f &point, const Light &light) {
     shared_ptr<Geometry> hit = NULL;
 
@@ -77,6 +81,56 @@ bool Renderer::inShadow(const Eigen::Vector3f &point, const Light &light) {
         }
     }
     return false;
+}
+
+Vector3f Renderer::monteCarloSample(const float u, const float v) {
+    const float radial = sqrt(u);
+    const float theta = 2.0 * M_PI * v;
+
+    const float x = radial * cos(theta);
+    const float y = radial * sin(theta);
+
+    return Vector3f(x, y, sqrt(1 - u));
+}
+
+Ray Renderer::monteCarloRay(const Matrix4f &rotation, const Vector3f &n, const Vector3f &p) {
+    const float u = rand() / (float) RAND_MAX;
+    const float v = rand() / (float) RAND_MAX;
+
+    Vector4f dir;
+    dir << monteCarloSample(u, v), 0;
+    dir = rotation * dir;
+
+    return Ray(p + epsilon * dir.head(3), dir.head(3));
+}
+
+
+Vector3f Renderer::monteCarloAmbient(const Vector3f &p, const std::shared_ptr<Geometry> object, const int depth, const int samples) {
+    Vector3f ambient = Vector3f(0, 0, 0);
+
+    const Vector3f n = object->normalAtPoint(p);
+
+    float angle = acos(Vector3f::UnitZ().dot(n));
+    Vector3f axis = Vector3f::UnitZ().cross(n);
+
+    Matrix4f rotation = Matrix4f::Identity();
+    rotation.block<3, 3>(0, 0) = (AngleAxisf(angle, axis)).toRotationMatrix();
+
+    // at depth 0, do 256 samples, 16 at depth 1, 1 at depth 2
+    int limit = pow(16, depth);
+    for (int i = 0; i < samples / limit; i++) {
+        const Ray r = monteCarloRay(rotation, n, p);
+        floatOptional t;
+        auto hitObj = scene->firstHit(r, t);
+        if (hitObj) {
+            const Vector3f hitP = r.getPoint(t.value);
+            const Vector3f color = calculateColor(r, hitP, hitObj, depth + 1);
+            const float weight = 0.01f;
+            ambient += (1.0 / (samples / limit)) * (color / exp(t.value * weight));
+        }
+    }
+
+    return ambient;
 }
 
 Vector3f Renderer::reflect(const Ray &r, const Vector3f &p, const shared_ptr<Geometry> object, int depth) {
@@ -164,6 +218,9 @@ Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Ge
     Vector3f local = (this->*localColor)(r, object, p);
 
     if (depth <= maxBounces) {
+        if (globalIlluminationOn) {
+            local += monteCarloAmbient(p, object, depth);
+        }
         Finish_t finish = object->getFinish();
 
         float fresnelReflectance = 0;
@@ -218,7 +275,13 @@ Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Ge
 Eigen::Vector3f Renderer::blinnPhongColor(const Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
     Vector3f pigment = object->color();
 
-    Vector3f ka = object->getFinish().ambient * pigment;
+    Vector3f ka;
+    if (globalIlluminationOn) {
+        ka << 0, 0, 0;
+    }
+    else {
+        ka = (object->getFinish().ambient * pigment);
+    }
     Vector3f kd = object->getFinish().diffuse * pigment;
     Vector3f ks = object->getFinish().specular * pigment;
     float power = object->getFinish().roughness;
@@ -276,7 +339,13 @@ Vector3f Renderer::blinnPhongSpecular(Eigen::Vector3f &n, Eigen::Vector3f &h,
 Eigen::Vector3f Renderer::cookTorranceColor(const Ray &r, std::shared_ptr<Geometry> object, Eigen::Vector3f p) {
     Vector3f pigment = object->color();
 
-    Vector3f ka = object->getFinish().ambient * pigment;
+    Vector3f ka;
+    if (globalIlluminationOn) {
+        ka << 0, 0, 0;
+    }
+    else {
+        ka = (object->getFinish().ambient * pigment);
+    }
     Vector3f kd = object->getFinish().diffuse * pigment;
     Vector3f ks = object->getFinish().specular * pigment;
     float roughness = object->getFinish().roughness;

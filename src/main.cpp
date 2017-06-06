@@ -18,6 +18,9 @@ void parseOptionalArgs(std::shared_ptr<Scene> sc, const char *argv[], int start,
         else if (strstr(argv[i], "-sds")) {
             sc->useSDS();
         }
+        else if (strstr(argv[i], "-gi")) {
+            sc->useGlobalIllumination();
+        }
         else {
             std::cout << "Unknown optional argument: " << argv[i] << '\n';
         }
@@ -52,7 +55,7 @@ int main(int argc, char const *argv[]) {
     }
     else if (strstr(argv[1], "render")) {
         if (argc < 5) {
-            std::cout << "usage: raytrace render <input file> <width> <height> [-altbrdf] [-ss=N] [-fresnel] [-sds]" << '\n';
+            std::cout << "usage: raytrace render <input file> <width> <height> [-altbrdf] [-ss=N] [-fresnel] [-sds] [-gi]" << '\n';
             exit(-1);
         }
         sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
@@ -62,7 +65,7 @@ int main(int argc, char const *argv[]) {
     }
     else if (strstr(argv[1], "pixelcolor")) {
         if (argc < 7) {
-            std::cout << "usage: raytrace pixelcolor <input file> <width> <height> <x> <y> [-altbrdf] [-ss=N] [-fresnel] [-sds]" << '\n';
+            std::cout << "usage: raytrace pixelcolor <input file> <width> <height> <x> <y> [-altbrdf] [-ss=N] [-fresnel] [-sds] [-gi]" << '\n';
             exit(-1);
         }
         sc->setImageSize(atoi(argv[3]), atoi(argv[4]));
@@ -72,7 +75,7 @@ int main(int argc, char const *argv[]) {
     }
     else if (strstr(argv[1], "printrays")) {
         if (argc < 7) {
-            std::cout << "usage: raytrace printrays <input file> <width> <height> <x> <y> [-altbrdf] [-ss=N] [-fresnel] [-sds]" << '\n';
+            std::cout << "usage: raytrace printrays <input file> <width> <height> <x> <y> [-altbrdf] [-ss=N] [-fresnel] [-sds] [-gi]" << '\n';
             exit(-1);
         }
         sc->setImageSize(atoi(argv[3]), atoi(argv[4]));

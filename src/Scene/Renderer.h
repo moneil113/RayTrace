@@ -44,6 +44,7 @@ private:
     bool trace = false;
     int superSamples = 1;
     bool doFresnel = false;
+    bool globalIlluminationOn = false;
 
     Scene *scene;
 
@@ -52,6 +53,12 @@ private:
     Color_t colorFromVector(const Eigen::Vector3f &v);
     Eigen::Vector3f calculateColor(const Ray &r, const Eigen::Vector3f &p,
         std::shared_ptr<Geometry> object, int depth);
+
+    Eigen::Vector3f monteCarloAmbient(const Eigen::Vector3f &p,
+        const std::shared_ptr<Geometry> object, const int depth, const int samples=256);
+    Ray monteCarloRay(const Eigen::Matrix4f &rotation, const Eigen::Vector3f &n,
+        const Eigen::Vector3f &p);
+    Eigen::Vector3f monteCarloSample(const float u, const float v);
 
     Eigen::Vector3f beersLawColor(const Eigen::Vector3f &refractColor,
         const Eigen::Vector3f &objectColor, float distance);
@@ -88,6 +95,7 @@ public:
     void setImageSize(int width, int height);
     void setSuperSamples(int n);
     void setFresnel();
+    void useGlobalIllumination();
 
     void renderScene(std::string output);
     void pixelColorTest(int x, int y);
