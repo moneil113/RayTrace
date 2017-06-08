@@ -18,6 +18,24 @@ void parseOptionalArgs(std::shared_ptr<Scene> sc, const char *argv[], int start,
         else if (strstr(argv[i], "-sds")) {
             sc->useSDS();
         }
+        else if (strstr(argv[i], "-gi_samples=")) {
+            int n;
+            sscanf(argv[i], "-gi_samples=%d", &n);
+            sc->useGlobalIllumination();
+            sc->setGISamples(n);
+        }
+        else if (strstr(argv[i], "-gi_bounces=")) {
+            int n;
+            sscanf(argv[i], "-gi_bounces=%d", &n);
+            sc->useGlobalIllumination();
+            sc->setGIBounces(n);
+        }
+        else if (strstr(argv[i], "-gi_ratio=")) {
+            int n;
+            sscanf(argv[i], "-gi_ratio=%d", &n);
+            sc->useGlobalIllumination();
+            sc->setGIRatio(n);
+        }
         else if (strstr(argv[i], "-gi")) {
             sc->useGlobalIllumination();
         }

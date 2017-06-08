@@ -64,6 +64,18 @@ void Scene::useGlobalIllumination() {
     renderer.useGlobalIllumination();
 }
 
+void Scene::setGISamples(int n) {
+    renderer.setGISamples(n);
+}
+
+void Scene::setGIBounces(int n) {
+    renderer.setGIBounces(n);
+}
+
+void Scene::setGIRatio(int n) {
+    renderer.setGIRatio(n);
+}
+
 void Scene::addLight(Light l) {
     lights.push_back(l);
 }

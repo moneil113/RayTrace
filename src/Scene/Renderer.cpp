@@ -63,6 +63,18 @@ void Renderer::useGlobalIllumination() {
     globalIlluminationOn = true;
 }
 
+void Renderer::setGISamples(int n) {
+    giSamples = n;
+}
+
+void Renderer::setGIBounces(int n) {
+    giBounces = n;
+}
+
+void Renderer::setGIRatio(int n) {
+    giRatio = n;
+}
+
 bool Renderer::inShadow(const Eigen::Vector3f &point, const Light &light) {
     shared_ptr<Geometry> hit = NULL;
 
@@ -116,17 +128,14 @@ Vector3f Renderer::monteCarloAmbient(const Vector3f &p, const std::shared_ptr<Ge
     Matrix4f rotation = Matrix4f::Identity();
     rotation.block<3, 3>(0, 0) = (AngleAxisf(angle, axis)).toRotationMatrix();
 
-    // at depth 0, do 256 samples, 16 at depth 1, 1 at depth 2
-    int limit = pow(16, depth);
-    for (int i = 0; i < samples / limit; i++) {
+    for (int i = 0; i < samples; i++) {
         const Ray r = monteCarloRay(rotation, n, p);
         floatOptional t;
         auto hitObj = scene->firstHit(r, t);
         if (hitObj) {
             const Vector3f hitP = r.getPoint(t.value);
             const Vector3f color = calculateColor(r, hitP, hitObj, depth + 1);
-            const float weight = 0.01f;
-            ambient += (1.0 / (samples / limit)) * (color / exp(t.value * weight));
+            ambient += (1.0 / samples) * color;
         }
     }
 
@@ -219,7 +228,10 @@ Vector3f Renderer::calculateColor(const Ray &r, const Vector3f &p, shared_ptr<Ge
 
     if (depth <= maxBounces) {
         if (globalIlluminationOn) {
-            local += monteCarloAmbient(p, object, depth);
+            if (depth < giBounces) {
+                int samples = giSamples / powf(giRatio, depth);
+                local += monteCarloAmbient(p, object, depth, samples);
+            }
         }
         Finish_t finish = object->getFinish();
 

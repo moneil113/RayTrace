@@ -37,6 +37,9 @@ public:
     void setFresnel();
     void useSDS();
     void useGlobalIllumination();
+    void setGISamples(int n);
+    void setGIBounces(int n);
+    void setGIRatio(int n);
 
     void addLight(Light l);
     void addGeometry(std::shared_ptr<Geometry> g);

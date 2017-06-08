@@ -45,6 +45,9 @@ private:
     int superSamples = 1;
     bool doFresnel = false;
     bool globalIlluminationOn = false;
+    int giSamples = 128;
+    int giBounces = 2;
+    int giRatio = 4;
 
     Scene *scene;
 
@@ -55,7 +58,7 @@ private:
         std::shared_ptr<Geometry> object, int depth);
 
     Eigen::Vector3f monteCarloAmbient(const Eigen::Vector3f &p,
-        const std::shared_ptr<Geometry> object, const int depth, const int samples=256);
+        const std::shared_ptr<Geometry> object, const int depth, const int samples);
     Ray monteCarloRay(const Eigen::Matrix4f &rotation, const Eigen::Vector3f &n,
         const Eigen::Vector3f &p);
     Eigen::Vector3f monteCarloSample(const float u, const float v);
@@ -96,6 +99,9 @@ public:
     void setSuperSamples(int n);
     void setFresnel();
     void useGlobalIllumination();
+    void setGISamples(int n);
+    void setGIBounces(int n);
+    void setGIRatio(int n);
 
     void renderScene(std::string output);
     void pixelColorTest(int x, int y);
