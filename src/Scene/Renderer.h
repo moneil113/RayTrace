@@ -51,7 +51,7 @@ private:
 
     Scene *scene;
 
-    bool inShadow(const Eigen::Vector3f &point, const Light &light);
+    bool inShadow(const Eigen::Vector3f &point, const Eigen::Vector3f &lightPos);
 
     Color_t colorFromVector(const Eigen::Vector3f &v);
     Eigen::Vector3f calculateColor(const Ray &r, const Eigen::Vector3f &p,

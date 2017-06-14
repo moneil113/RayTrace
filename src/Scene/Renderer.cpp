@@ -75,17 +75,17 @@ void Renderer::setGIRatio(int n) {
     giRatio = n;
 }
 
-bool Renderer::inShadow(const Eigen::Vector3f &point, const Light &light) {
+bool Renderer::inShadow(const Eigen::Vector3f &point, const Eigen::Vector3f &lightPos) {
     shared_ptr<Geometry> hit = NULL;
 
-    Vector3f l = (light.getLocation() - point).normalized();
+    Vector3f l = (lightPos - point).normalized();
     floatOptional t;
     Ray lightRay = Ray(point + epsilon * l, l);
     hit = scene->firstHit(lightRay, t);
 
     //Check if we hit something behind the light
     if (hit) {
-        if ((light.getLocation() - point).norm() < t.value) {
+        if ((lightPos - point).norm() < t.value) {
             return false;
         }
         else {
@@ -312,21 +312,27 @@ Eigen::Vector3f Renderer::blinnPhongColor(const Ray &r, std::shared_ptr<Geometry
     for (int i = 0; i < scene->lights.size(); i++) {
         auto light = scene->lights.at(i);
         Vector3f l = (light.getLocation() - p).normalized();
+        const float sampleWeight = light.sampleWeight();
 
-        if (!inShadow(p, light)) {
-            Vector3f h = (v + l).normalized();
-            Vector3f lc = light.getColor();
-            Vector3f diff = blinnPhongDiffuse(n, l, kd, lc);
-            Vector3f spec = blinnPhongSpecular(n, h, ks, power, lc);
-            color += diff;
-            color += spec;
+        for (int i = 0; i < light.getRowSamples(); i++) {
+            for (size_t j = 0; j < light.getColumnSamples(); j++) {
+                if (!inShadow(p, light.samplePosition(i, j))) {
+                    Vector3f h = (v + l).normalized();
+                    Vector3f lc = light.getColor();
+                    Vector3f diff = blinnPhongDiffuse(n, l, kd, lc);
+                    Vector3f spec = blinnPhongSpecular(n, h, ks, power, lc);
+                    color += diff * sampleWeight;
+                    color += spec * sampleWeight;
 
-            if (trace) {
-                cout << "         Ambient: " << object->formatVector(ka) << endl;
-                cout << "         Diffuse: " << object->formatVector(diff) << endl;
-                cout << "        Specular: " << object->formatVector(spec) << endl;
+                    if (trace) {
+                        cout << "         Ambient: " << object->formatVector(ka) << endl;
+                        cout << "         Diffuse: " << object->formatVector(diff) << endl;
+                        cout << "        Specular: " << object->formatVector(spec) << endl;
+                    }
+                }
             }
         }
+
     }
 
     return color;
@@ -370,26 +376,32 @@ Eigen::Vector3f Renderer::cookTorranceColor(const Ray &r, std::shared_ptr<Geomet
     for (int i = 0; i < scene->lights.size(); i++) {
         auto light = scene->lights.at(i);
         Vector3f l = (light.getLocation() - p).normalized();
+        const float sampleWeight = light.sampleWeight();
 
-        if (!inShadow(p, light)) {
-            Vector3f h = (v + l).normalized();
-            Vector3f lc = light.getColor();
-            Vector3f rd = kd * fmaxf(0, n.dot(l));
+        for (int i = 0; i < light.getRowSamples(); i++) {
+            for (int j = 0; j < light.getColumnSamples(); j++) {
+                if (!inShadow(p, light.samplePosition(i, j))) {
+                    Vector3f h = (v + l).normalized();
+                    Vector3f lc = light.getColor();
+                    Vector3f rd = kd * fmaxf(0, n.dot(l));
 
-            float d = D_ggx(h, n, roughness);
+                    float d = D_ggx(h, n, roughness);
 
-            float g = G_ggx(l, v, n, roughness);
+                    float g = G_ggx(l, v, n, roughness);
 
-            Finish_t finish = object->getFinish();
-            float ior = finish.ior;
-            float f = fresnel(ior, v, h);
+                    Finish_t finish = object->getFinish();
+                    float ior = finish.ior;
+                    float f = fresnel(ior, v, h);
 
-            Vector3f rs = ks * d * g * f / (4 * n.dot(v));
+                    Vector3f rs = ks * d * g * f / (4 * n.dot(v));
 
-            float s = finish.specular;
+                    float s = finish.specular;
 
-            color += lc.cwiseProduct(((1 - s) * rd + s * rs));
+                    color += lc.cwiseProduct(((1 - s) * rd + s * rs)) * sampleWeight;
+                }
+            }
         }
+
     }
 
     return color;

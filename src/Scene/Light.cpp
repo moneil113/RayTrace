@@ -4,6 +4,19 @@ Light::Light() {
 
 }
 
+Eigen::Vector3f Light::samplePosition(const int i, const int j) const {
+    if (rowSamples == 1 && columnSamples == 1) {
+        return location;
+    }
+    Eigen::Vector3f pos = corner + i * (axis1 / rowSamples);
+    pos += j * (axis2 / columnSamples);
+    return pos;
+}
+
+float Light::sampleWeight() const {
+    return 1.0 / (rowSamples * columnSamples);
+}
+
 std::string Light::to_string() {
     std::stringstream str;
 

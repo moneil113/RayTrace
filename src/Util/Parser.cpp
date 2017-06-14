@@ -127,6 +127,8 @@ void Parser::parseAreaLight(std::string line, Light &l) {
         sub = sub.substr(start);
         l.axis2 = readVec3(sub);
 
+        l.corner = l.location - l.axis1 / 2 - l.axis2 / 2;
+
         start = sub.find(">");
         sub = sub.substr(start);
         l.rowSamples = (int)readFloat(sub);

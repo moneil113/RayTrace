@@ -16,13 +16,21 @@ private:
     Eigen::Vector3f axis1;
     Eigen::Vector3f axis2;
 
-    int rowSamples, columnSamples;
+    Eigen::Vector3f corner;
+
+    int rowSamples = 1, columnSamples = 1;
 
 public:
     Light ();
 
     const Eigen::Vector3f &getLocation() const { return location; }
     const Eigen::Vector3f &getColor() const { return color; }
+
+    int getRowSamples() const { return rowSamples; }
+    int getColumnSamples() const { return columnSamples; }
+
+    Eigen::Vector3f samplePosition(const int i, const int j) const;
+    float sampleWeight() const;
 
     std::string to_string();
 };
