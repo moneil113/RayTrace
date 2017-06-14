@@ -9,10 +9,12 @@ class Parser {
 private:
     std::ifstream in;
 
-    void parseComment();
-    // Parse objects
+    // Parse scene objects
     void parseCamera(std::string line);
     void parseLight_source(std::string line);
+    void parseAreaLight(std::string line, Light &l);
+
+    // Parse geometry objects
     void parseSphere(std::string line);
     void parsePlane(std::string line);
     void parseBox(std::string line);

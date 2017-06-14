@@ -12,6 +12,12 @@ private:
     Eigen::Vector3f location;
     Eigen::Vector3f color;
 
+    bool areaLight = false;
+    Eigen::Vector3f axis1;
+    Eigen::Vector3f axis2;
+
+    int rowSamples, columnSamples;
+
 public:
     Light ();
 

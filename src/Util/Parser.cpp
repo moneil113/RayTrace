@@ -95,12 +95,51 @@ void Parser::parseCamera(std::string line) {
 }
 
 void Parser::parseLight_source(std::string line) {
+    if (line.find("}") == string::npos) {
+        getline(in, line);
+    }
     Light l;
     l.location = readVec3(line);
     int color = line.find("color");
     l.color = readVec3(line.substr(color));
 
+    if (line.find("}") == string::npos) {
+        parseAreaLight(line, l);
+    }
+
     scene->addLight(l);
+}
+
+void Parser::parseAreaLight(std::string line, Light &l) {
+    while (line.find("area_light") == string::npos && line.find("}") == string::npos) {
+        getline(in, line);
+    }
+    if (line.find("area_light") != string::npos) {
+        l.areaLight = true;
+
+        getline(in, line);
+
+        int start = line.find("<");
+        string sub = line.substr(start);
+        l.axis1 = readVec3(sub);
+
+        start = sub.find("<", 1);
+        sub = sub.substr(start);
+        l.axis2 = readVec3(sub);
+
+        start = sub.find(">");
+        sub = sub.substr(start);
+        l.rowSamples = (int)readFloat(sub);
+
+        start = sub.find(",", 2);
+        sub = sub.substr(start);
+        l.columnSamples = (int)readFloat(sub);
+
+        // read to the end of the light
+        while (line.find("}") == string::npos) {
+            getline(in, line);
+        }
+    }
 }
 
 void Parser::parseSphere(std::string l) {
