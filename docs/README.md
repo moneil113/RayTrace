@@ -1,23 +1,56 @@
 # RayTrace
 
-## Soft Lighting
-
-I chose to implement soft lighting using multi-sample area lights. I felt this feature would do the most to help create interesting images without requiring an extensive redesign of software components.
-
-My research of soft area lights included the section on soft shadows in the Shirley textbook and the [pov-ray specification for area lights](http://www.povray.org/documentation/view/3.6.0/313/).
+This project is a physically based ray trace renderer implementing a subset of
+the POV-ray scene description language. It provides supports for a number of
+geometric primitives, including boxes, spheres, and planes, as well as more
+complex triangle meshes.
 
 ---
 
-## Software Design
+# Features
 
-I designed my ray tracer to have relatively small functions that belong to relevant
-classes. Because functions are smaller (the longest function in the `Renderer` class is 60
-lines), they are easier to read and understand. This compartmentalization also allows for
-the testing of smaller pieces of code responsible for only one thing.
+The ray tracer supports the following features.
 
-The functions responsible for Monte Carlo global illumination in the `Renderer` class are a
-good example of this practice. If a boolean flag has been set, then the ambient term of an
-object's color is determined by a call to  `monteCarloAmbient()`. In turn,
-`monteCarloAmbient()` produces a number of reflected rays that are created in the
-`monteCarloRay()` function. These rays are themselves seeded using cosine-weighted sample
-points generated in `monteCarloSample()`.
+## Reflection and Refraction
+
+* Physically-based refraction and reflection including approximations for
+fresnel reflectance and energy conservation
+
+![Refraction](img/Refraction.png)
+
+![Reflection](img/Shiny.png)
+
+## Antialiasing
+
+* Antialiasing with variable number of subpixel samples
+
+![No Antialiasing](img/NoAA.png)
+
+![With Antialiasing](img/AA.png)
+
+## Spatial Transformations
+
+* Arbitrary spatial transformations of geometric objects
+
+![Transformations](img/Transform.png)
+
+## Bounding Volume Hierarchies
+
+* Bounding volume hierarchies for fast ray intersection calculations for large
+scenes
+
+![Lots of Spheres](img/Gnarly.png)
+
+## Monte Carlo Global illumination
+
+* Monte Carlo global illumination with variable depth and samples
+
+![Monte Carlo Global illumination](img/MonteCarlo.png)
+
+## Soft Area Lights
+
+* Soft lighting and shadows through use of multisample area lights
+
+![Bunny](img/Bunny.png)
+
+![Room](img/Room.png)
