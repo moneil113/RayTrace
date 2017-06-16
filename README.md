@@ -1,5 +1,7 @@
 # RayTrace
 
+A full list of features can be found [here](https://moneil113.github.io/RayTrace/).
+
 ## Soft Lighting
 
 I chose to implement soft lighting using multi-sample area lights. I felt this
