@@ -45,3 +45,52 @@ object's color is determined by a call to  `monteCarloAmbient()`. In turn,
 `monteCarloAmbient()` produces a number of reflected rays that are created in the
 `monteCarloRay()` function. These rays are themselves seeded using cosine-weighted sample
 points generated in `monteCarloSample()`.
+
+```c++
+Vector3f Renderer::monteCarloSample(const float u, const float v) {
+    const float radial = sqrt(u);
+    const float theta = 2.0 * M_PI * v;
+
+    const float x = radial * cos(theta);
+    const float y = radial * sin(theta);
+
+    return Vector3f(x, y, sqrt(1 - u));
+}
+
+Ray Renderer::monteCarloRay(const Matrix4f &rotation, const Vector3f &n, const Vector3f &p) {
+    const float u = rand() / (float) RAND_MAX;
+    const float v = rand() / (float) RAND_MAX;
+
+    Vector4f dir;
+    dir << monteCarloSample(u, v), 0;
+    dir = rotation * dir;
+
+    return Ray(p + epsilon * dir.head(3), dir.head(3));
+}
+
+
+Vector3f Renderer::monteCarloAmbient(const Vector3f &p, const std::shared_ptr<Geometry> object, const int depth, const int samples) {
+    Vector3f ambient = Vector3f(0, 0, 0);
+
+    const Vector3f n = object->normalAtPoint(p);
+
+    float angle = acos(Vector3f::UnitZ().dot(n));
+    Vector3f axis = Vector3f::UnitZ().cross(n);
+
+    Matrix4f rotation = Matrix4f::Identity();
+    rotation.block<3, 3>(0, 0) = (AngleAxisf(angle, axis)).toRotationMatrix();
+
+    for (int i = 0; i < samples; i++) {
+        const Ray r = monteCarloRay(rotation, n, p);
+        floatOptional t;
+        auto hitObj = scene->firstHit(r, t);
+        if (hitObj) {
+            const Vector3f hitP = r.getPoint(t.value);
+            const Vector3f color = calculateColor(r, hitP, hitObj, depth + 1);
+            ambient += (1.0 / samples) * color;
+        }
+    }
+
+    return ambient;
+}
+```
