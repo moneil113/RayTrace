@@ -2,9 +2,33 @@
 
 ## Soft Lighting
 
-I chose to implement soft lighting using multi-sample area lights. I felt this feature would do the most to help create interesting images without requiring an extensive redesign of software components.
+I chose to implement soft lighting using multi-sample area lights. I felt this
+feature would do the most to help create interesting images without requiring an
+extensive redesign of software components.
 
-My research of soft area lights included the section on soft shadows in the Shirley textbook and the [pov-ray specification for area lights](http://www.povray.org/documentation/view/3.6.0/313/).
+My research of soft area lights included the section on soft shadows in the
+Shirley textbook and the [pov-ray specification for area lights](http://www.povray.org/documentation/view/3.6.0/313/).
+
+Until now, lights have been represented as as single points. The result is that
+shadows cast by the light have hard edges.
+
+![Hard shadows](Examples/simple-hard.png)
+
+In reality, lights are not a single point in space, but emit light in an area
+around their centers. For example, a lightbulb emits light from the entire
+surface of the bulb.
+
+I model this behavior by treating area lights as an array of point lights and
+blending the light contribution of each of these samples when calculating shadows
+and local colors.
+
+Some examples images rendered with soft lighting are shown here.
+
+![Soft shadows](Examples/simple-area.png)
+
+![Bunny](Examples/bunny-area.png)
+
+![Room](Examples/room-area.png)
 
 ---
 
