@@ -7,6 +7,7 @@
 #include <Eigen/Dense>
 
 #include <iostream>
+#include <thread>
 
 struct Color_t {
     unsigned char r;
@@ -48,6 +49,10 @@ private:
     int giSamples = 128;
     int giBounces = 2;
     int giRatio = 4;
+
+    int numThreads = 1;
+    std::vector<std::thread> renderThreads;
+    void threadRender(const int threadId);
 
     Scene *scene;
 
@@ -94,14 +99,15 @@ private:
 public:
     Renderer(Scene *sc);
 
-    void setBRDF(int type);
-    void setImageSize(int width, int height);
-    void setSuperSamples(int n);
+    void setBRDF(const int type);
+    void setImageSize(const int width, const int height);
+    void setSuperSamples(const int n);
     void setFresnel();
     void useGlobalIllumination();
-    void setGISamples(int n);
-    void setGIBounces(int n);
-    void setGIRatio(int n);
+    void setGISamples(const int n);
+    void setGIBounces(const int n);
+    void setGIRatio(const int n);
+    void setNumThreads(const int n);
 
     void renderScene(std::string output);
     void pixelColorTest(int x, int y);

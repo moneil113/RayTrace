@@ -4,6 +4,7 @@
 
 #include <math.h>
 #include <iostream>
+#include <thread>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../Util/stb_image_write.h"
@@ -16,6 +17,12 @@ Renderer::Renderer(Scene *sc) {
     scene = sc;
     brdf = 0;
     localColor = &Renderer::blinnPhongColor;
+
+    const unsigned numCores = thread::hardware_concurrency();
+    if (numCores != 0) {
+        numThreads = numCores;
+    }
+    renderThreads = vector<thread>(numThreads);
 }
 
 Color_t Renderer::colorFromVector(const Eigen::Vector3f &v) {
@@ -27,7 +34,7 @@ Color_t Renderer::colorFromVector(const Eigen::Vector3f &v) {
     return color;
 }
 
-void Renderer::setBRDF(int type) {
+void Renderer::setBRDF(const int type) {
     brdf = type;
     if (brdf == 0) {
         localColor = &Renderer::blinnPhongColor;
@@ -41,7 +48,7 @@ void Renderer::setBRDF(int type) {
     }
 }
 
-void Renderer::setImageSize(int width, int height) {
+void Renderer::setImageSize(const int width, const int height) {
     if (pixels) {
         delete pixels;
     }
@@ -51,7 +58,7 @@ void Renderer::setImageSize(int width, int height) {
     this->height = height;
 }
 
-void Renderer::setSuperSamples(int n) {
+void Renderer::setSuperSamples(const int n) {
     superSamples = n;
 }
 
@@ -63,16 +70,22 @@ void Renderer::useGlobalIllumination() {
     globalIlluminationOn = true;
 }
 
-void Renderer::setGISamples(int n) {
+void Renderer::setGISamples(const int n) {
     giSamples = n;
 }
 
-void Renderer::setGIBounces(int n) {
+void Renderer::setGIBounces(const int n) {
     giBounces = n;
 }
 
-void Renderer::setGIRatio(int n) {
+void Renderer::setGIRatio(const int n) {
     giRatio = n;
+}
+
+void Renderer::setNumThreads(const int n) {
+    if (n < numThreads && n > 0) {
+        numThreads = n;
+    }
 }
 
 bool Renderer::inShadow(const Eigen::Vector3f &point, const Eigen::Vector3f &lightPos) {
@@ -470,7 +483,26 @@ Eigen::Vector3f Renderer::averagePixelColor(int x, int y) {
 }
 
 void Renderer::renderScene(std::string output) {
-    for (int y = 0; y < height; y++) {
+    for (size_t threadId = 0; threadId < numThreads; threadId++) {
+        renderThreads[threadId] = thread( [this, threadId]
+            { threadRender(threadId); }
+        );
+    }
+
+    for (size_t threadId = 0; threadId < numThreads; threadId++) {
+        renderThreads[threadId].join();
+    }
+
+    stbi_write_png(output.c_str(), width, height, 3, pixels, width * sizeof(Color_t));
+}
+
+void Renderer::threadRender(const int threadId) {
+    // How many rows does each thread render
+    const int span = (height + numThreads - 1) / numThreads;
+    const int start = threadId * span;
+    const int end = start + span;
+
+    for (int y = start; y < end && y < height; y++) {
         for (int x = 0; x < width; x++) {
             Vector3f color;
             if (superSamples != 1) {
@@ -483,8 +515,6 @@ void Renderer::renderScene(std::string output) {
             pixels[width * (height - 1 - y) + x] = colorFromVector(color);
         }
     }
-
-    stbi_write_png(output.c_str(), width, height, 3, pixels, width * sizeof(Color_t));
 }
 
 void Renderer::pixelColorTest(int x, int y) {

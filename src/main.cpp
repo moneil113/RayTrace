@@ -39,6 +39,9 @@ void parseOptionalArgs(std::shared_ptr<Scene> sc, const char *argv[], int start,
         else if (strstr(argv[i], "-gi")) {
             sc->useGlobalIllumination();
         }
+        else if (strstr(argv[i], "-singleThread")) {
+            sc->setNumThreads(1);
+        }
         else {
             std::cout << "Unknown optional argument: " << argv[i] << '\n';
         }

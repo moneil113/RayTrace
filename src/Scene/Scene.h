@@ -31,15 +31,16 @@ public:
 
     void print();
     void setCamera(Camera newCam);
-    void setImageSize(int width, int height);
-    void setBRDF(int type);
-    void setSuperSamples(int n);
+    void setImageSize(const int width, const int height);
+    void setBRDF(const int type);
+    void setSuperSamples(const int n);
     void setFresnel();
     void useSDS();
     void useGlobalIllumination();
-    void setGISamples(int n);
-    void setGIBounces(int n);
-    void setGIRatio(int n);
+    void setGISamples(const int n);
+    void setGIBounces(const int n);
+    void setGIRatio(const int n);
+    void setNumThreads(const int n);
 
     void addLight(Light l);
     void addGeometry(std::shared_ptr<Geometry> g);

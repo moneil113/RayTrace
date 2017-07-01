@@ -59,8 +59,9 @@ floatOptional Triangle::objectIntersect(const Ray &r) {
     Vector3f d = r.direction();
     float det = d.x() * det1 - d.y() * det2 + d.z() * det3;
 
-    mat.col(2) = r.direction();
-    Matrix3f mat2 = mat;
+    Matrix3f tempMat = mat;
+    tempMat.col(2) = r.direction();
+    Matrix3f mat2 = tempMat;
     mat2.col(0) = rhs;
     beta = mat2.determinant() / det;
 
@@ -68,7 +69,7 @@ floatOptional Triangle::objectIntersect(const Ray &r) {
         return {false, 0.0f};
     }
 
-    mat2 = mat;
+    mat2 = tempMat;
     mat2.col(1) = rhs;
     gamma = mat2.determinant() / det;
 
@@ -76,7 +77,7 @@ floatOptional Triangle::objectIntersect(const Ray &r) {
         return {false, 0.0f};
     }
 
-    mat2 = mat;
+    mat2 = tempMat;
     mat2.col(2) = rhs;
     t = mat2.determinant() / det;
 

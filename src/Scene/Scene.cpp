@@ -38,16 +38,16 @@ void Scene::setCamera(Camera newCam) {
     camera = newCam;
 }
 
-void Scene::setImageSize(int width, int height) {
+void Scene::setImageSize(const int width, const int height) {
     camera.setImageSize(width, height);
     renderer.setImageSize(width, height);
 }
 
-void Scene::setBRDF(int type) {
+void Scene::setBRDF(const int type) {
     renderer.setBRDF(type);
 }
 
-void Scene::setSuperSamples(int n) {
+void Scene::setSuperSamples(const int n) {
     renderer.setSuperSamples(n);
 }
 
@@ -64,16 +64,20 @@ void Scene::useGlobalIllumination() {
     renderer.useGlobalIllumination();
 }
 
-void Scene::setGISamples(int n) {
+void Scene::setGISamples(const int n) {
     renderer.setGISamples(n);
 }
 
-void Scene::setGIBounces(int n) {
+void Scene::setGIBounces(const int n) {
     renderer.setGIBounces(n);
 }
 
-void Scene::setGIRatio(int n) {
+void Scene::setGIRatio(const int n) {
     renderer.setGIRatio(n);
+}
+
+void Scene::setNumThreads(const int n) {
+    renderer.setNumThreads(n);
 }
 
 void Scene::addLight(Light l) {
